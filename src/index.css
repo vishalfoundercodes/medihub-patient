@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+/* 🌈 Custom Theme (Tailwind v4 way) */
+@theme {
+  /* 🔵 Primary Colors */
+  --color-primary: #2563EB;
+  --color-primary-dark: #1E40AF;
+  --color-primary-light: #3B82F6;
+
+  /* ⚪ Background */
+  --color-bg-main: #F8FAFC;
+  --color-bg-section: #F1F5F9;
+
+  /* ⚫ Text */
+  --color-text-dark: #0F172A;
+  --color-text-primary: #1E293B;
+  --color-text-secondary: #64748B;
+
+  /* 🟢 Success */
+  --color-success: #22C55E;
+  --color-success-bg: #DCFCE7;
+
+  /* 🟣 Accent */
+  --color-purple: #8B5CF6;
+  --color-purple-bg: #EDE9FE;
+
+  /* 🔷 Cyan */
+  --color-cyan: #06B6D4;
+  --color-cyan-bg: #CFFAFE;
+
+  /* 🟡 Warning */
+  --color-warning: #F59E0B;
+
+  /* ⚙️ Border */
+  --color-border: #E2E8F0;
+
+  /* 🎯 Radius */
+  --radius-main: 16px;
+}
+
+/* 🌍 Global Styles */
+body {
+  background-color: var(--color-bg-main);
+  color: var(--color-text-primary);
+  font-family: "Poppins", sans-serif;
+}
