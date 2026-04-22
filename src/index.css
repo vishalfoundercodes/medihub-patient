@@ -44,3 +44,17 @@ body {
   color: var(--color-text-primary);
   font-family: "Poppins", sans-serif;
 }
+/* Hide scrollbar (Chrome, Safari, Edge) */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar (Firefox) */
+.hide-scrollbar {
+  scrollbar-width: none;
+}
+
+/* Hide scrollbar (IE, older Edge) */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+}

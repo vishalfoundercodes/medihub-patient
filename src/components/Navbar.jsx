@@ -1,16 +1,14 @@
 import { useState } from 'react';
-import { MapPin, Bell, ChevronDown, Menu, X, User, LogIn } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
+import { MapPin, Bell, ChevronDown, Menu, X, LogIn } from 'lucide-react';
 import medihubLogo from "../assets/medihubLogo.png";
 
 const navLinks = [
-  { label: 'Home', active: true },
-  { label: 'Lab' },
-  { label: 'Medicines' },
-  { label: 'Doctors' },
-  // { label: 'Health Tips' },
-  // { label: 'Offers', badge: 'New' },
-  // { label: 'About Us' },
-  { label: 'Contact' },
+  { label: 'Home', to: '/' },
+  { label: 'Tests', to: '/lab-tests' },
+  { label: 'Medicines', to: '/medicines' },
+  { label: 'Doctors', to: '/doctors' },
+  // { label: 'Contact', to: '#' },
 ];
 
 export default function Navbar() {
@@ -41,27 +39,32 @@ export default function Navbar() {
 
           {/* Nav Links — desktop */}
           <div className="hidden lg:flex items-center gap-1">
-            {navLinks.map(({ label, active, badge }) => (
-              <a
+            {navLinks.map(({ label, to, badge }) => (
+              <NavLink
                 key={label}
-                href="#"
-                className={`relative px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center gap-1.5
-                  ${
-                    active
-                      ? "text-[var(--color-primary)] bg-blue-50"
-                      : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-dark)] hover:bg-gray-50"
-                  }`}
+                to={to}
+                className={({ isActive }) =>
+                  `relative px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center gap-1.5
+                  ${isActive
+                    ? 'text-[var(--color-primary)] bg-blue-50'
+                    : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-dark)] hover:bg-gray-50'
+                  }`
+                }
               >
-                {label}
-                {badge && (
-                  <span className="bg-[var(--color-primary)] text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-full leading-none">
-                    {badge}
-                  </span>
+                {({ isActive }) => (
+                  <>
+                    {label}
+                    {badge && (
+                      <span className="bg-[var(--color-primary)] text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-full leading-none">
+                        {badge}
+                      </span>
+                    )}
+                    {isActive && (
+                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-[var(--color-primary)] rounded-full" />
+                    )}
+                  </>
                 )}
-                {active && (
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-[var(--color-primary)] rounded-full" />
-                )}
-              </a>
+              </NavLink>
             ))}
           </div>
 
@@ -112,16 +115,18 @@ export default function Navbar() {
       {mobileOpen && (
         <div className="lg:hidden bg-white border-b border-[var(--color-border)] px-6 py-4">
           <div className="flex flex-col gap-1 mb-4">
-            {navLinks.map(({ label, active, badge }) => (
-              <a
+            {navLinks.map(({ label, to, badge }) => (
+              <NavLink
                 key={label}
-                href="#"
-                className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all
-                  ${
-                    active
-                      ? "bg-blue-50 text-[var(--color-primary)]"
-                      : "text-[var(--color-text-secondary)] hover:bg-gray-50 hover:text-[var(--color-text-dark)]"
-                  }`}
+                to={to}
+                onClick={() => setMobileOpen(false)}
+                className={({ isActive }) =>
+                  `flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all
+                  ${isActive
+                    ? 'bg-blue-50 text-[var(--color-primary)]'
+                    : 'text-[var(--color-text-secondary)] hover:bg-gray-50 hover:text-[var(--color-text-dark)]'
+                  }`
+                }
               >
                 {label}
                 {badge && (
@@ -129,7 +134,7 @@ export default function Navbar() {
                     {badge}
                   </span>
                 )}
-              </a>
+              </NavLink>
             ))}
           </div>
 

@@ -11,16 +11,16 @@ export default function Stats() {
 
   return (
     <section className=" py-10">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-10">
+      <div className="max-w-7xl mx-auto px-1 md:px-6">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-6 md:gap-10">
           {stats.map((stat, i) => (
-            <div key={i} className="text-center grid grid-cols-2 items-center">
-              <stat.icon className={`w-12 h-12 ${stat.color} mx-auto mb-3`} />
+            <div key={i} className="text-start md:text-center grid grid-cols-2 gap-1 items-center">
+              <stat.icon className={`w-8 h-8 md:w-12 md:h-12 ${stat.color} mx-auto mb-3`} />
               <div>
-                <h3 className={`text-2xl font-bold ${stat.color} mb-1`}>
+                <h3 className={`text-2xl font-bold ${stat.color} md:mb-1`}>
                   {stat.value}
                 </h3>
-                <p className="text-sm text-[var(--color-text-secondary)] whitespace-nowrap">
+                <p className="text-sm text-[var(--color-text-secondary)] md:whitespace-nowrap">
                   {stat.label}
                 </p>
               </div>

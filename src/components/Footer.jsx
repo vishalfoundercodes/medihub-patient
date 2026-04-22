@@ -124,7 +124,7 @@ export default function Footer() {
             <div className="flex gap-2">
               <a
                 href="#"
-                className="bg-black text-white whitespace-nowrap text-xs px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-gray-800"
+                className="bg-black text-white whitespace-nowrap text-xs px-2 py-2 rounded-lg flex items-center gap-2 hover:bg-gray-800"
               >
                 <svg
                   className="w-4 h-4"
@@ -137,7 +137,7 @@ export default function Footer() {
               </a>
               <a
                 href="#"
-                className="bg-black text-white whitespace-nowrap text-xs px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-gray-800"
+                className="bg-black text-white whitespace-nowrap text-xs px-2 py-2 rounded-lg flex items-center gap-2 hover:bg-gray-800"
               >
                 <svg
                   className="w-4 h-4"

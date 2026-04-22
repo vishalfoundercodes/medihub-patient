@@ -57,7 +57,7 @@ export default function Features() {
           ))}
 
           {/* Need Help — spans 2 columns */}
-          <div className="lg:col-span-2 bg-[var(--color-bg-section)] rounded-xl p-6 flex items-center justify-between gap-4">
+          <div className="lg:col-span-2 bg-[var(--color-bg-section)] rounded-xl p-1 md:p-6 flex items-center justify-between gap-4">
             <div className="grid grid-cols-2 items-center gap-5">
               {/* <div className="bg-white p-3 rounded-full shrink-0">
                 <MessageCircle className="w-6 h-6 text-[var(--color-primary)]" />
@@ -74,7 +74,7 @@ export default function Features() {
                   Contact Support
                 </button>
               </div>
-              <div className=" p-3 rounded-full items-center justify-center mx-auto">
+              <div className="p-3 rounded-full items-center justify-end mx-auto">
                 <MessageCircle className="w-18 h-18 text-[var(--color-primary)]" />
               </div>
             </div>
