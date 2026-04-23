@@ -1,9 +1,10 @@
 import { Mail } from 'lucide-react';
+import Container from './Container';
 
 export default function Newsletter() {
   return (
     <section className="bg-white py-16">
-      <div className="max-w-7xl mx-auto px-6">
+      <Container>
         <div className="bg-[var(--color-bg-section)] rounded-xl p-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4">
             <div className="bg-white p-4 rounded-full">
@@ -25,7 +26,7 @@ export default function Newsletter() {
             </button>
           </div>
         </div>
-      </div>
-    </section>
+      </Container>
+      </section>
   );
 }

@@ -8,19 +8,20 @@ import TopDoctors from '../components/TopDoctors';
 import Stats from '../components/Stats';
 import Newsletter from '../components/Newsletter';
 import Footer from '../components/Footer';
+import Container from '../components/Container';
 
 export default function Home() {
   return (
     <div className="bg-[var(--color-bg-main)]">
       <Navbar />
       <Hero />
-      <div className="-mt-8 relative z-50">
+      <div className="-mt-8 relative z-10">
         <QuickActions />
       </div>
 
       <HighlightBanner />
       <Features />
-      <div className="max-w-7xl mx-auto px-3 py-2 grid lg:grid-cols-2 gap-8">
+      <Container className="py-2 grid lg:grid-cols-2 gap-8">
         <div>
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-xl font-bold text-[var(--color-text-dark)]">
@@ -162,7 +163,7 @@ export default function Home() {
             ))}
           </div>
         </div>
-      </div>
+      </Container>
       <Stats />
       {/* <Newsletter /> */}
       <Footer />

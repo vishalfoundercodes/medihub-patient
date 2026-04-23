@@ -1,11 +1,12 @@
 import { Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
 import medihubLogo from "../assets/medihubLogo.png";
+import Container from './Container';
 
 export default function Footer() {
   return (
     <footer className="bg-white border-t border-[var(--color-border)]">
       <div className="max-w-full mx-auto  pt-12">
-        <div className="grid grid-cols-2 md:grid-cols-7 gap-0 mb-8 px-6">
+        <Container className="grid grid-cols-2 md:grid-cols-7 gap-0 mb-8">
           <div className="col-span-2">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center">
@@ -150,29 +151,20 @@ export default function Footer() {
               </a>
             </div>
           </div>
-        </div>
-
-        {/* <div className="bg-primary items-center px-4 py-2">
-          <div className="pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-white">
-              © 2024 MediHub1. All rights reserved.
-            </p>
-            <p className="text-sm text-white flex items-center gap-1">
-              Made with <span className="text-red-500">❤</span> for better
-              healthcare
-            </p>
-          </div>
-        </div> */}
-        <div className="bg-primary px-4 py-2 flex items-center rounded-b-xl">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 w-full">
-            <p className="text-sm text-white">
-              © 2024 MediHub1. All rights reserved.
-            </p>
-            <p className="text-sm text-white flex items-center gap-1">
-              Made with <span className="text-red-500">❤</span> for better
-              healthcare
-            </p>
-          </div>
+        </Container>
+      </div>
+      <div
+        className="bg-primary px-[4rem] py-2 flex items-center rounded-b-xl"
+     
+      >
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 w-full">
+          <p className="text-sm text-white">
+            © 2024 MediHub1. All rights reserved.
+          </p>
+          <p className="text-sm text-white flex items-center gap-1">
+            Made with <span className="text-red-500">❤</span> for better
+            healthcare
+          </p>
         </div>
       </div>
     </footer>

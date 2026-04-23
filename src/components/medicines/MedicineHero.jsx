@@ -1,12 +1,13 @@
 import { useRef } from 'react';
 import { Search, X, ShoppingCart } from 'lucide-react';
+import Container from '../Container';
 
 export default function MedicineHero({ searchQuery, onSearch, cartCount, cartTotal }) {
   const inputRef = useRef(null);
 
   return (
     <div className="bg-white border-b border-[var(--color-border)]">
-      <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row md:items-center gap-4">
+      <Container className="py-6 flex flex-col md:flex-row md:items-center gap-4">
         {/* Left — title */}
         <div className="shrink-0">
           <h1 className="text-3xl font-bold text-[var(--color-text-dark)]">Medicines</h1>
@@ -63,7 +64,5 @@ export default function MedicineHero({ searchQuery, onSearch, cartCount, cartTot
             </div>
           </button>
         </div>
-      </div>
-    </div>
-  );
-}
+      </Container>
+      </div>)}

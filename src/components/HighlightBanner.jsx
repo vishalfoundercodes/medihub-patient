@@ -1,9 +1,10 @@
 import { Shield } from 'lucide-react';
+import Container from './Container';
 
 export default function HighlightBanner() {
   return (
     <section className="bg-[var(--color-bg-main)] pb-2">
-      <div className="max-w-7xl mx-auto px-6">
+      <Container>
         <div className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-xl p-4 flex items-center gap-4 text-white relative overflow-hidden">
           <Shield className="w-18 h-18 md:w-10 md:h-10" />
           <div>
@@ -24,7 +25,7 @@ export default function HighlightBanner() {
             <path d="M0,50 Q50,0 100,50 T200,50 L200,100 L0,100 Z" />
           </svg>
         </div>
-      </div>
-    </section>
+      </Container>
+      </section>
   );
 }

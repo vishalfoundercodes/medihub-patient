@@ -8,6 +8,7 @@ import MedicineFilters from '../components/medicines/MedicineFilters';
 import MedicineGrid from '../components/medicines/MedicineGrid';
 import MedicineTrustBar from '../components/medicines/MedicineTrustBar';
 import { medicines } from '../data/medicinesData';
+import Container from '../components/Container';
 
 const defaultFilters = {
   categories: ['All Categories'],
@@ -117,7 +118,7 @@ export default function Medicines() {
       />
       <MedicineCategoryTabs active={activeTab} onChange={setActiveTab} />
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <Container className="py-8">
         {/* Mobile filter toggle */}
         <div className="flex items-center justify-between mb-5 lg:hidden">
           <p className="text-sm font-semibold text-[var(--color-text-dark)]">
@@ -156,9 +157,7 @@ export default function Medicines() {
             <MedicineTrustBar />
           </div>
         </div>
-      </div>
-
-      {/* Mobile filter drawer */}
+      </Container>
       {mobileFilterOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-black/40" onClick={() => setMobileFilterOpen(false)} />

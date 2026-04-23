@@ -1,12 +1,13 @@
 import { useRef } from 'react';
 import { Search, X } from 'lucide-react';
+import Container from '../Container';
 
 export default function DoctorHero({ searchQuery, onSearch }) {
   const inputRef = useRef(null);
 
   return (
     <div className="bg-white border-b border-[var(--color-border)]">
-      <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <Container className="py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="shrink-0">
           <h1 className="text-3xl font-bold text-[var(--color-text-dark)]">Find the Right Doctor</h1>
           <p className="text-sm text-[var(--color-text-secondary)] mt-1">
@@ -37,7 +38,5 @@ export default function DoctorHero({ searchQuery, onSearch }) {
             Search
           </button>
         </div>
-      </div>
-    </div>
-  );
-}
+      </Container>
+      </div>)}

@@ -1,4 +1,5 @@
 import { ShoppingCart, ArrowRight, X } from 'lucide-react';
+import Container from '../Container';
 
 export default function CartBar({ selected, onClear }) {
   if (selected.length === 0) return null;
@@ -9,7 +10,7 @@ export default function CartBar({ selected, onClear }) {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-[var(--color-border)] shadow-2xl">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col sm:flex-row items-center gap-4 justify-between">
+      <Container className="py-4 flex flex-col sm:flex-row items-center gap-4 justify-between">
 
         {/* Left — cart info */}
         <div className="flex items-center gap-4">
@@ -46,7 +47,5 @@ export default function CartBar({ selected, onClear }) {
           Proceed to Checkout
           <ArrowRight className="w-5 h-5" />
         </button>
-      </div>
-    </div>
-  );
-}
+      </Container>
+      </div>)}

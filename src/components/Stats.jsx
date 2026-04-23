@@ -1,4 +1,5 @@
 import { Users, TestTube, Pill, Stethoscope, Headphones } from 'lucide-react';
+import Container from './Container';
 
 export default function Stats() {
   const stats = [
@@ -11,7 +12,7 @@ export default function Stats() {
 
   return (
     <section className=" py-10">
-      <div className="max-w-7xl mx-auto px-1 md:px-6">
+      <Container>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-6 md:gap-10">
           {stats.map((stat, i) => (
             <div key={i} className="text-start md:text-center grid grid-cols-2 gap-1 items-center">
@@ -27,7 +28,7 @@ export default function Stats() {
             </div>
           ))}
         </div>
-      </div>
-    </section>
+      </Container>
+      </section>
   );
 }

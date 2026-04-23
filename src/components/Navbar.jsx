@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { MapPin, Bell, ChevronDown, Menu, X, LogIn } from 'lucide-react';
 import medihubLogo from "../assets/medihubLogo.png";
+import Container from './Container';
 
 const navLinks = [
   { label: 'Home', to: '/' },
@@ -18,7 +19,7 @@ export default function Navbar() {
     <nav className="bg-white sticky top-0 z-50 shadow-sm">
       {/* Top bar */}
       <div className="border-b border-[var(--color-border)]">
-        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+        <Container className="py-3 flex items-center justify-between">
           {/* Logo */}
           <a href="#" className="flex items-center gap-2.5 shrink-0">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-blue-200">
@@ -108,10 +109,8 @@ export default function Navbar() {
               )}
             </button>
           </div>
+        </Container>
         </div>
-      </div>
-
-      {/* Mobile menu */}
       {mobileOpen && (
         <div className="lg:hidden bg-white border-b border-[var(--color-border)] px-6 py-4">
           <div className="flex flex-col gap-1 mb-4">

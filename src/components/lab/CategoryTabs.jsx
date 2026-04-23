@@ -1,10 +1,11 @@
 import { ChevronDown } from 'lucide-react';
 import { categories } from '../../data/labTestsData';
+import Container from '../Container';
 
 export default function CategoryTabs({ active, onChange }) {
   return (
     <div className="bg-white border-b border-[var(--color-border)] sticky top-[65px] z-40">
-      <div className="max-w-7xl mx-auto px-6">
+      <Container>
         <div className="flex items-center gap-2 overflow-x-auto hide-scrollbar py-3">
           {categories.map(({ label, icon }) => (
             <button
@@ -24,7 +25,5 @@ export default function CategoryTabs({ active, onChange }) {
             More <ChevronDown className="w-4 h-4" />
           </button> */}
         </div>
-      </div>
-    </div>
-  );
-}
+      </Container>
+      </div>)}

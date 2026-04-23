@@ -9,6 +9,7 @@ import LabTestGrid from '../components/lab/LabTestGrid';
 import LabTrustBar from '../components/lab/LabTrustBar';
 import CartBar from '../components/lab/CartBar';
 import { labTests } from '../data/labTestsData';
+import Container from '../components/Container';
 
 const defaultFilters = {
   categories: ['All Category'],
@@ -100,7 +101,7 @@ export default function LabTests() {
       <LabHero searchQuery={searchQuery} onSearch={setSearchQuery} />
       <CategoryTabs active={activeTab} onChange={setActiveTab} />
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <Container className="py-8">
         {/* Mobile filter toggle */}
         <div className="flex items-center justify-between mb-5 lg:hidden">
           <p className="text-sm font-semibold text-[var(--color-text-dark)]">
@@ -138,9 +139,7 @@ export default function LabTests() {
             <LabTrustBar />
           </div>
         </div>
-      </div>
-
-      {/* Mobile filter drawer */}
+      </Container>
       {mobileFilterOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-black/40" onClick={() => setMobileFilterOpen(false)} />

@@ -36,6 +36,10 @@
 
   /* 🎯 Radius */
   --radius-main: 16px;
+
+  /* 📐 Layout */
+  --width-container: 1400px;
+  --padding-container: 1rem;
 }
 
 /* 🌍 Global Styles */

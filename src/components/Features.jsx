@@ -1,4 +1,5 @@
 import { TestTube, Pill, Users, ShieldCheck, MessageCircle } from 'lucide-react';
+import Container from './Container';
 
 export default function Features() {
   const features = [
@@ -34,7 +35,7 @@ export default function Features() {
 
   return (
     <section className="bg-white py-6">
-      <div className="max-w-7xl mx-auto px-6">
+      <Container>
         <div className="grid md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8 items-center">
           {features.map((feature, i) => (
             <div key={i} className="lg:col-span-1 text-start items-center">
@@ -80,7 +81,7 @@ export default function Features() {
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </Container>
+      </section>
   );
 }
