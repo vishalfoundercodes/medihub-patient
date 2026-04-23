@@ -1,0 +1,46 @@
+export const MOCK_TICKETS = [
+  {
+    id: 'TKT-001',
+    name: 'Rahul Kumar',
+    issue: 'Payment not reflected',
+    description: 'I made a payment for Full Body Checkup on May 10, 2024 but the booking is not confirmed yet.',
+    status: 'Resolved',
+    createdAt: 'May 10, 2024 at 10:30 AM',
+    updatedAt: 'May 11, 2024 at 02:15 PM',
+    image: null,
+    response: 'Your payment has been verified and booking is now confirmed. Sorry for the inconvenience.',
+  },
+  {
+    id: 'TKT-002',
+    name: 'Rahul Kumar',
+    issue: 'Report not received',
+    description: 'My Thyroid Profile test was done on Apr 20, 2024 but I have not received the report yet.',
+    status: 'In Progress',
+    createdAt: 'Apr 22, 2024 at 09:00 AM',
+    updatedAt: 'Apr 22, 2024 at 11:30 AM',
+    image: null,
+    response: 'We are looking into this. Your report will be available within 24 hours.',
+  },
+  {
+    id: 'TKT-003',
+    name: 'Rahul Kumar',
+    issue: 'Wrong medicine delivered',
+    description: 'I ordered Crocin 650mg but received Dolo 650mg instead. Please help me with the replacement.',
+    status: 'Open',
+    createdAt: 'Mar 15, 2024 at 04:45 PM',
+    updatedAt: 'Mar 15, 2024 at 04:45 PM',
+    image: null,
+    response: null,
+  },
+];
+
+export const ISSUE_CATEGORIES = [
+  'Payment Issue',
+  'Report Not Received',
+  'Wrong Medicine Delivered',
+  'Appointment Cancellation',
+  'Refund Request',
+  'Lab Test Issue',
+  'App/Website Issue',
+  'Other',
+];

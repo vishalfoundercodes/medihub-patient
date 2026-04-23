@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { SlidersHorizontal, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import MedicineHero from '../components/medicines/MedicineHero';
@@ -24,6 +25,7 @@ export default function Medicines() {
   const [searchQuery, setSearchQuery] = useState('');
   const [cart, setCart] = useState({});
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleFilterChange = (type, value) => {
     setFilters((prev) => {
@@ -115,6 +117,7 @@ export default function Medicines() {
         onSearch={setSearchQuery}
         cartCount={cartCount}
         cartTotal={cartTotal}
+        onCartClick={() => navigate('/medicine-cart', { state: { cart } })}
       />
       <MedicineCategoryTabs active={activeTab} onChange={setActiveTab} />
 

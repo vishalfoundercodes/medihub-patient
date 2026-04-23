@@ -71,27 +71,6 @@ export default function LabDetailOverview({ test }) {
         </div>
       </div>
 
-      {/* Similar tests */}
-      {/* <div className="bg-white rounded-2xl border border-[var(--color-border)] p-6">
-        <h3 className="font-bold text-[var(--color-text-dark)] mb-5">You may also like</h3>
-        <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
-          {test.similarTests.map((t) => (
-            <div key={t.id} className="shrink-0 w-44 border border-[var(--color-border)] rounded-xl overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
-              <img src={t.image} alt={t.name} className="w-full h-24 object-cover" />
-              <div className="p-3">
-                <p className="text-xs font-bold text-[var(--color-text-dark)] mb-1 leading-snug">{t.name}</p>
-                <div className="flex items-center gap-1.5 mb-1">
-                  <span className="text-sm font-bold text-[var(--color-text-dark)]">₹{t.price}</span>
-                  <span className="text-xs text-[var(--color-text-secondary)] line-through">₹{t.original}</span>
-                </div>
-                <span className="text-[10px] font-bold text-[var(--color-success)] bg-[var(--color-success-bg)] px-2 py-0.5 rounded-full">
-                  {t.discount}% OFF
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div> */}
     </div>
   );
 }

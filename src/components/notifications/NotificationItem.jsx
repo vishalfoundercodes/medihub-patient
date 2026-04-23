@@ -48,7 +48,7 @@ export default function NotificationItem({ notification, onRead }) {
             )}
           </div>
         </div>
-        <p className="text-sm text-[var(--color-text-secondary)] mt-1 leading-relaxed">
+        <p className="text-sm text-[var(--color-text-secondary)] mt-1 whitespace-normal">
           {notification.message}
           {notification.link && (
             <>

@@ -122,34 +122,38 @@ export default function LoginModal() {
 
       {/* Modal */}
       <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-
         {/* Header gradient */}
         <div className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] px-8 pt-8 pb-10">
           <button
             onClick={() => setShowLogin(false)}
-            className="absolute top-4 right-4 w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white transition-all"
+            className="absolute top-4 right-4 w-8 h-8 bg-white/20 cursor-pointer hover:bg-white/30 rounded-full flex items-center justify-center text-white transition-all"
           >
             <X className="w-4 h-4" />
           </button>
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-              {step === STEPS.SUCCESS
-                ? <CheckCircle className="w-6 h-6 text-white" />
-                : step === STEPS.OTP
-                  ? <Shield className="w-6 h-6 text-white" />
-                  : <Phone className="w-6 h-6 text-white" />
-              }
+              {step === STEPS.SUCCESS ? (
+                <CheckCircle className="w-6 h-6 text-white" />
+              ) : step === STEPS.OTP ? (
+                <Shield className="w-6 h-6 text-white" />
+              ) : (
+                <Phone className="w-6 h-6 text-white" />
+              )}
             </div>
             <div>
               <h2 className="text-xl font-bold text-white">
-                {step === STEPS.SUCCESS ? 'Welcome Back!' : step === STEPS.OTP ? 'Verify OTP' : 'Login / Register'}
+                {step === STEPS.SUCCESS
+                  ? "Welcome Back!"
+                  : step === STEPS.OTP
+                    ? "Verify OTP"
+                    : "Login / Register"}
               </h2>
               <p className="text-blue-100 text-xs">
                 {step === STEPS.SUCCESS
-                  ? 'You are successfully logged in'
+                  ? "You are successfully logged in"
                   : step === STEPS.OTP
                     ? `OTP sent to +91 ${phone}`
-                    : 'Enter your mobile number to continue'}
+                    : "Enter your mobile number to continue"}
               </p>
             </div>
           </div>
@@ -159,20 +163,28 @@ export default function LoginModal() {
         <div className="flex items-center justify-center gap-2 -mt-4 mb-2 relative z-10">
           {[STEPS.PHONE, STEPS.OTP, STEPS.SUCCESS].map((s, i) => (
             <div key={s} className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all
-                ${step === s || (step === STEPS.SUCCESS && i < 3) || (step === STEPS.OTP && i === 0)
-                  ? 'bg-[var(--color-primary)] border-[var(--color-primary)] text-white'
-                  : 'bg-white border-gray-200 text-gray-400'
-                }`}>
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all
+                ${
+                  step === s ||
+                  (step === STEPS.SUCCESS && i < 3) ||
+                  (step === STEPS.OTP && i === 0)
+                    ? "bg-[var(--color-primary)] border-[var(--color-primary)] text-white"
+                    : "bg-white border-gray-200 text-gray-400"
+                }`}
+              >
                 {i + 1}
               </div>
-              {i < 2 && <div className={`w-8 h-0.5 ${step !== STEPS.PHONE && i === 0 ? 'bg-[var(--color-primary)]' : step === STEPS.SUCCESS && i === 1 ? 'bg-[var(--color-primary)]' : 'bg-gray-200'}`} />}
+              {i < 2 && (
+                <div
+                  className={`w-8 h-0.5 ${step !== STEPS.PHONE && i === 0 ? "bg-[var(--color-primary)]" : step === STEPS.SUCCESS && i === 1 ? "bg-[var(--color-primary)]" : "bg-gray-200"}`}
+                />
+              )}
             </div>
           ))}
         </div>
 
         <div className="px-4 md:px-8 pb-8 pt-4">
-
           {/* ── STEP 1: Phone ── */}
           {step === STEPS.PHONE && (
             <div className="space-y-4">
@@ -182,34 +194,55 @@ export default function LoginModal() {
                 </label>
                 <div className="flex gap-2">
                   <div className="flex items-center gap-2 border border-[var(--color-border)] rounded-xl px-3 bg-gray-50 shrink-0">
-                    <span className="text-sm font-semibold text-[var(--color-text-dark)]">🇮🇳 +91</span>
+                    <span className="text-sm font-semibold text-[var(--color-text-dark)]">
+                      🇮🇳 +91
+                    </span>
                   </div>
                   <input
                     type="tel"
                     maxLength={10}
                     value={phone}
-                    onChange={(e) => { setPhone(e.target.value.replace(/\D/g, '')); setError(''); }}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSendOtp()}
+                    onChange={(e) => {
+                      setPhone(e.target.value.replace(/\D/g, ""));
+                      setError("");
+                    }}
+                    onKeyDown={(e) => e.key === "Enter" && handleSendOtp()}
                     placeholder="Enter 10-digit number"
                     className="flex-1 border border-[var(--color-border)] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-white"
                     autoFocus
                   />
                 </div>
-                {error && <p className="text-red-500 text-xs mt-1.5">{error}</p>}
+                {error && (
+                  <p className="text-red-500 text-xs mt-1.5">{error}</p>
+                )}
               </div>
               <p className="text-xs text-[var(--color-text-secondary)]">
-                By continuing, you agree to our{' '}
-                <a href="#" className="text-[var(--color-primary)] hover:underline">Terms of Service</a>{' '}
-                and{' '}
-                <a href="#" className="text-[var(--color-primary)] hover:underline">Privacy Policy</a>
+                By continuing, you agree to our{" "}
+                <a
+                  href="#"
+                  className="text-[var(--color-primary)] hover:underline"
+                >
+                  Terms of Service
+                </a>{" "}
+                and{" "}
+                <a
+                  href="#"
+                  className="text-[var(--color-primary)] hover:underline"
+                >
+                  Privacy Policy
+                </a>
               </p>
               <button
                 onClick={handleSendOtp}
                 disabled={loading || phone.length !== 10}
-                className="w-full bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all"
+                className="w-full bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all"
               >
-                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Phone className="w-4 h-4" />}
-                {loading ? 'Sending OTP...' : 'Send OTP'}
+                {loading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Phone className="w-4 h-4" />
+                )}
+                {loading ? "Sending OTP..." : "Send OTP"}
               </button>
             </div>
           )}
@@ -222,7 +255,10 @@ export default function LoginModal() {
                 <label className="text-sm font-semibold text-[var(--color-text-dark)] mb-3 block">
                   Enter 6-digit OTP
                 </label>
-                <div className="flex gap-2 justify-between" onPaste={handleOtpPaste}>
+                <div
+                  className="flex gap-2 justify-between"
+                  onPaste={handleOtpPaste}
+                >
                   {otp.map((digit, idx) => (
                     <input
                       key={idx}
@@ -234,11 +270,12 @@ export default function LoginModal() {
                       onChange={(e) => handleOtpChange(e.target.value, idx)}
                       onKeyDown={(e) => handleOtpKeyDown(e, idx)}
                       className={`w-10 h-10 md:w-12 md:h-12 text-center text-lg font-bold border-2 rounded-xl focus:outline-none transition-all
-                        ${otpVerified
-                          ? 'border-[var(--color-success)] bg-green-50 text-[var(--color-success)]'
-                          : digit
-                            ? 'border-[var(--color-primary)] bg-blue-50 text-[var(--color-primary)]'
-                            : 'border-[var(--color-border)] focus:border-[var(--color-primary)]'
+                        ${
+                          otpVerified
+                            ? "border-[var(--color-success)] bg-green-50 text-[var(--color-success)]"
+                            : digit
+                              ? "border-[var(--color-primary)] bg-blue-50 text-[var(--color-primary)]"
+                              : "border-[var(--color-border)] focus:border-[var(--color-primary)]"
                         }`}
                     />
                   ))}
@@ -246,7 +283,8 @@ export default function LoginModal() {
                 {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
                 {otpVerified && (
                   <p className="text-[var(--color-success)] text-xs mt-2 flex items-center gap-1 font-medium">
-                    <CheckCircle className="w-3.5 h-3.5" /> OTP verified successfully!
+                    <CheckCircle className="w-3.5 h-3.5" /> OTP verified
+                    successfully!
                   </p>
                 )}
               </div>
@@ -254,26 +292,43 @@ export default function LoginModal() {
               {/* Resend */}
               <div className="flex items-center justify-between text-xs">
                 <button
-                  onClick={() => { setStep(STEPS.PHONE); setOtp(['', '', '', '', '', '']); setOtpVerified(false); setError(''); }}
-                  className="text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]"
+                  onClick={() => {
+                    setStep(STEPS.PHONE);
+                    setOtp(["", "", "", "", "", ""]);
+                    setOtpVerified(false);
+                    setError("");
+                  }}
+                  className="text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] cursor-pointer"
                 >
                   ← Change number
                 </button>
-                {resendTimer > 0
-                  ? <span className="text-[var(--color-text-secondary)]">Resend in {resendTimer}s</span>
-                  : <button onClick={handleResend} className="text-[var(--color-primary)] font-semibold hover:underline">Resend OTP</button>
-                }
+                {resendTimer > 0 ? (
+                  <span className="text-[var(--color-text-secondary)]">
+                    Resend in {resendTimer}s
+                  </span>
+                ) : (
+                  <button
+                    onClick={handleResend}
+                    className="text-[var(--color-primary)] cursor-pointer font-semibold hover:underline"
+                  >
+                    Resend OTP
+                  </button>
+                )}
               </div>
 
               {/* Verify button */}
               {!otpVerified && (
                 <button
                   onClick={handleVerifyOtp}
-                  disabled={loading || otp.join('').length < 6}
-                  className="w-full bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all"
+                  disabled={loading || otp.join("").length < 6}
+                  className="w-full bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all"
                 >
-                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Shield className="w-4 h-4" />}
-                  {loading ? 'Verifying...' : 'Verify OTP'}
+                  {loading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Shield className="w-4 h-4" />
+                  )}
+                  {loading ? "Verifying..." : "Verify OTP"}
                 </button>
               )}
 
@@ -281,7 +336,7 @@ export default function LoginModal() {
               {otpVerified && (
                 <button
                   onClick={handleLogin}
-                  className="w-full bg-[var(--color-success)] hover:bg-green-600 text-white font-semibold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-green-100"
+                  className="w-full bg-[var(--color-success)] hover:bg-green-600 cursor-pointer text-white font-semibold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-green-100"
                 >
                   <LogIn className="w-4 h-4" />
                   Login to MediHub
@@ -296,8 +351,12 @@ export default function LoginModal() {
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle className="w-9 h-9 text-[var(--color-success)]" />
               </div>
-              <h3 className="text-lg font-bold text-[var(--color-text-dark)] mb-1">Login Successful!</h3>
-              <p className="text-sm text-[var(--color-text-secondary)]">Redirecting you to your dashboard...</p>
+              <h3 className="text-lg font-bold text-[var(--color-text-dark)] mb-1">
+                Login Successful!
+              </h3>
+              <p className="text-sm text-[var(--color-text-secondary)]">
+                Redirecting you to your dashboard...
+              </p>
               <div className="mt-4 flex justify-center">
                 <Loader2 className="w-5 h-5 animate-spin text-[var(--color-primary)]" />
               </div>

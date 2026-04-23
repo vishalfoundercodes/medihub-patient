@@ -7,13 +7,13 @@ const navItems = [
   { id: 'orders', label: 'My Orders', icon: ShoppingBag },
   { id: 'labtests', label: 'My Lab Tests', icon: FlaskConical },
   { id: 'appointments', label: 'My Appointments', icon: Calendar },
-  { id: 'reports', label: 'My Reports', icon: FileText },
-  { id: 'prescriptions', label: 'My Prescriptions', icon: Pill },
+  // { id: 'reports', label: 'My Reports', icon: FileText },
+  // { id: 'prescriptions', label: 'My Prescriptions', icon: Pill },
   { id: 'addresses', label: 'My Addresses', icon: MapPin },
-  { id: 'payments', label: 'Payment Methods', icon: CreditCard },
-  { id: 'offers', label: 'Offers & Wallet', icon: Tag },
+  // { id: 'payments', label: 'Payment Methods', icon: CreditCard },
+  // { id: 'offers', label: 'Offers & Wallet', icon: Tag },
   { id: 'notifications', label: 'Notifications', icon: Bell },
-  { id: 'settings', label: 'Settings', icon: Settings },
+  // { id: 'settings', label: 'Settings', icon: Settings },
   { id: 'help', label: 'Help & Support', icon: HelpCircle },
 ];
 
@@ -29,6 +29,7 @@ export default function AccountSidebar({ active, onChange }) {
     if (id === 'labtests') { navigate('/my-lab-tests'); return; }
     if (id === 'appointments') { navigate('/appointments'); return; }
     if (id === 'notifications') { navigate('/notifications'); return; }
+    if (id === 'help') { navigate('/help-support'); return; }
     onChange(id);
   };
 
@@ -51,7 +52,7 @@ export default function AccountSidebar({ active, onChange }) {
           <button
             key={id}
             onClick={() => handleClick(id)}
-            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all text-left
+            className={`w-full flex items-center gap-3 px-4 py-2.5 cursor-pointer rounded-xl text-sm font-medium transition-all text-left
               ${active === id
                 ? 'bg-blue-50 text-[var(--color-primary)]'
                 : 'text-[var(--color-text-secondary)] hover:bg-gray-50 hover:text-[var(--color-text-dark)]'
@@ -65,7 +66,7 @@ export default function AccountSidebar({ active, onChange }) {
         {/* Logout */}
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 transition-all mt-1"
+          className="w-full flex items-center gap-3 px-4 py-2.5 cursor-pointer rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 transition-all mt-1"
         >
           <LogOut className="w-4 h-4 shrink-0" />
           Logout

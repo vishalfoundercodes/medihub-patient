@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Heart, Star, Video, Building2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function DoctorCard({ doctor }) {
   const [wished, setWished] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div className="bg-white rounded-2xl border border-[var(--color-border)] hover:border-blue-200 hover:shadow-lg transition-all duration-200 overflow-hidden group">
@@ -58,7 +60,9 @@ export default function DoctorCard({ doctor }) {
         )}
 
         {/* Book Appointment */}
-        <button className="w-full bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white py-2.5 rounded-xl text-sm font-semibold transition-all">
+        <button
+          onClick={() => navigate(`/book-appointment/${doctor.id}`)}
+          className="w-full bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] cursor-pointer text-white py-2.5 rounded-xl text-sm font-semibold transition-all">
           Book Appointment
         </button>
       </div>

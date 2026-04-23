@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { Search, X, ShoppingCart } from 'lucide-react';
 import Container from '../Container';
 
-export default function MedicineHero({ searchQuery, onSearch, cartCount, cartTotal }) {
+export default function MedicineHero({ searchQuery, onSearch, cartCount, cartTotal, onCartClick }) {
   const inputRef = useRef(null);
 
   return (
@@ -47,7 +47,7 @@ export default function MedicineHero({ searchQuery, onSearch, cartCount, cartTot
 
         {/* Right — cart */}
         <div className="shrink-0">
-          <button className="relative flex items-center gap-3 border border-[var(--color-border)] hover:border-[var(--color-primary)] px-4 py-2.5 rounded-xl transition-all group">
+          <button onClick={onCartClick} className="relative flex items-center gap-3 border border-[var(--color-border)] hover:border-[var(--color-primary)] px-4 py-2.5 rounded-xl transition-all group">
             <div className="relative">
               <ShoppingCart className="w-5 h-5 text-[var(--color-text-secondary)] group-hover:text-[var(--color-primary)]" />
               {cartCount > 0 && (

@@ -5,19 +5,21 @@ import medihubLogo from "../assets/medihubLogo.png";
 import Container from './Container';
 import { useAuth } from '../context/AuthContext';
 
-const navLinks = [
-  { label: 'Home', to: '/' },
-  { label: 'Tests', to: '/lab-tests' },
-  { label: 'Medicines', to: '/medicines' },
-  { label: 'Doctors', to: '/doctors' },
-  // { label: 'Contact', to: '#' },
-];
+
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, logout, setShowLogin } = useAuth();
   const navigate = useNavigate();
 
+  const navLinks = [
+    { label: "Home", to: "/" },
+    { label: "Tests", to: "/lab-tests" },
+    { label: "Medicines", to: "/medicines" },
+    { label: "Doctors", to: "/doctors" },
+    ...(user ? [{ label: "Account", to: "/account" }] : []),
+  ];
+  
   return (
     <nav className="bg-white sticky top-0 z-50 shadow-sm">
       {/* Top bar */}
@@ -49,9 +51,10 @@ export default function Navbar() {
                 to={to}
                 className={({ isActive }) =>
                   `relative px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center gap-1.5
-                  ${isActive
-                    ? 'text-[var(--color-primary)] bg-blue-50'
-                    : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-dark)] hover:bg-gray-50'
+                  ${
+                    isActive
+                      ? "text-[var(--color-primary)] bg-blue-50"
+                      : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-dark)] hover:bg-gray-50"
                   }`
                 }
               >
@@ -90,8 +93,9 @@ export default function Navbar() {
 
             {/* Bell */}
             <button
-              onClick={() => navigate('/notifications')}
-              className="relative w-9 h-9 flex items-center justify-center rounded-xl border border-[var(--color-border)] hover:border-[var(--color-primary)] hover:bg-blue-50 transition-all">
+              onClick={() => navigate("/notifications")}
+              className="relative w-9 h-9 flex items-center justify-center rounded-xl border border-[var(--color-border)] hover:border-[var(--color-primary)] hover:bg-blue-50 transition-all"
+            >
               <Bell className="w-4.5 h-4.5 text-[var(--color-text-secondary)]" />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
             </button>
@@ -100,14 +104,16 @@ export default function Navbar() {
             {user ? (
               <div className="hidden md:flex items-center gap-2">
                 <button
-                  onClick={() => navigate('/account')}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 border border-blue-100 hover:border-[var(--color-primary)] transition-all"
+                  onClick={() => navigate("/account")}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 cursor-pointer  border border-blue-100 hover:border-[var(--color-primary)] transition-all"
                 >
                   <div className="w-7 h-7 bg-[var(--color-primary)] rounded-full flex items-center justify-center">
                     <User className="w-4 h-4 text-white" />
                   </div>
-                  <span className="text-sm font-semibold text-[var(--color-text-dark)]">Hi, {user.name.split(' ')[0]}</span>
-                  <ChevronDown className="w-3 h-3 text-[var(--color-text-secondary)]" />
+                  <span className="text-sm font-semibold text-[var(--color-text-dark)]">
+                    Hi, {user.name.split(" ")[0]}
+                  </span>
+                  {/* <ChevronDown className="w-3 h-3 text-[var(--color-text-secondary)]" /> */}
                 </button>
                 <button
                   onClick={logout}
@@ -139,7 +145,7 @@ export default function Navbar() {
             </button>
           </div>
         </Container>
-        </div>
+      </div>
       {mobileOpen && (
         <div className="lg:hidden bg-white border-b border-[var(--color-border)] px-6 py-4">
           <div className="flex flex-col gap-1 mb-4">
@@ -150,13 +156,14 @@ export default function Navbar() {
                 onClick={() => setMobileOpen(false)}
                 className={({ isActive }) =>
                   `flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all
-                  ${isActive
-                    ? 'bg-blue-50 text-[var(--color-primary)]'
-                    : 'text-[var(--color-text-secondary)] hover:bg-gray-50 hover:text-[var(--color-text-dark)]'
+                  ${
+                    isActive
+                      ? "bg-blue-50 text-[var(--color-primary)]"
+                      : "text-[var(--color-text-secondary)] hover:bg-gray-50 hover:text-[var(--color-text-dark)]"
                   }`
                 }
               >
-                {label}
+                { label}
                 {badge && (
                   <span className="bg-[var(--color-primary)] text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
                     {badge}
@@ -172,11 +179,11 @@ export default function Navbar() {
               New Delhi, 110001
             </button>
             <button
-              onClick={() => user ? logout() : setShowLogin(true)}
+              onClick={() => (user ? logout() : setShowLogin(true))}
               className="ml-auto flex items-center gap-2 bg-[var(--color-primary)] text-white text-sm font-semibold px-5 py-2.5 rounded-xl"
             >
               <LogIn className="w-4 h-4" />
-              {user ? 'Logout' : 'Login'}
+              {user ? "Logout" : "Login"}
             </button>
           </div>
         </div>

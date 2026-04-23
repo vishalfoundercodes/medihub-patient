@@ -10,6 +10,7 @@ import ProfileInfo from '../components/account/ProfileInfo';
 import AccountOverview from '../components/account/AccountOverview';
 import RecentOrders from '../components/account/RecentOrders';
 import AccountQuickActions from '../components/account/AccountQuickActions';
+import MyAddresses from '../components/account/MyAddresses';
 import { useAuth } from '../context/AuthContext';
 import { ShoppingBag, FlaskConical, Calendar, FileText, Pill, MapPin, CreditCard, Tag, Bell, Settings, HelpCircle } from 'lucide-react';
 
@@ -103,6 +104,8 @@ export default function Account() {
                 {/* Quick actions */}
                 <AccountQuickActions />
               </>
+            ) : activeSection === 'addresses' ? (
+              <MyAddresses />
             ) : (
               <>
                 <div>

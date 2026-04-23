@@ -1,12 +1,18 @@
 import { ShoppingCart, ArrowRight, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Container from '../Container';
 
 export default function CartBar({ selected, onClear }) {
+  const navigate = useNavigate();
   if (selected.length === 0) return null;
 
   const total = selected.reduce((sum, t) => sum + t.price, 0);
   const originalTotal = selected.reduce((sum, t) => sum + t.original, 0);
   const saved = originalTotal - total;
+
+  const handleCheckout = () => {
+    navigate('/lab-checkout', { state: { selected } });
+  };
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-[var(--color-border)] shadow-2xl">
@@ -43,9 +49,14 @@ export default function CartBar({ selected, onClear }) {
         </div>
 
         {/* Right — CTA */}
-        <button className="w-full sm:w-auto bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white font-bold px-8 py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-200">
+        <button
+          onClick={handleCheckout}
+          className="w-full sm:w-auto bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] cursor-pointer text-white font-bold px-8 py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-200"
+        >
           Proceed to Checkout
           <ArrowRight className="w-5 h-5" />
         </button>
       </Container>
-      </div>)}
+    </div>
+  );
+}

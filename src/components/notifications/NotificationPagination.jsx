@@ -13,7 +13,7 @@ export default function NotificationPagination({ current, total, perPage, onChan
   };
 
   return (
-    <div className="flex items-center justify-between flex-wrap gap-4">
+    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
       <p className="text-sm text-[var(--color-text-secondary)]">
         Showing <span className="font-semibold text-[var(--color-text-dark)]">{from} to {to}</span> of{' '}
         <span className="font-semibold text-[var(--color-text-dark)]">{total}</span> notifications

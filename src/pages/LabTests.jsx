@@ -160,7 +160,7 @@ export default function LabTests() {
       )}
 
       {/* Cart bar padding so content isn't hidden behind it */}
-      {selected.length > 0 && <div className="h-24" />}
+      {/* {selected.length > 0 && <div className="h-24" />} */}
 
       <Footer />
       <CartBar selected={selected} onClear={() => setSelected([])} />
