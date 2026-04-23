@@ -1,4 +1,5 @@
 import { Pill, FlaskConical, Calendar, ChevronRight, MapPin } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const statusStyle = {
   Delivered:  { text: 'text-[var(--color-success)]',  bg: 'bg-green-100',  border: 'border-green-100' },
@@ -20,6 +21,7 @@ const actionLabel = {
 };
 
 export default function OrderCard({ order }) {
+  const navigate = useNavigate();
   const { icon: Icon, bg: iconBg, color: iconColor } = typeIcon[order.type] || typeIcon['Medicines'];
   const st = statusStyle[order.status] || statusStyle.Delivered;
   const itemLabel = order.type === 'Appointment' ? 'Appointment' : order.type === 'Lab Test' ? 'Test' : 'Item';
@@ -76,10 +78,14 @@ export default function OrderCard({ order }) {
 
         {/* Action */}
         <div className="flex items-center gap-2 shrink-0">
-          <button className="border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-blue-100 text-sm font-semibold px-4 py-2 rounded-xl transition-all whitespace-nowrap">
+          <button
+            onClick={() => navigate(`/order/${order.id}`)}
+            className="border border-[var(--color-primary)] text-[var(--color-primary)] cursor-pointer hover:bg-blue-100 text-sm font-semibold px-4 py-2 rounded-xl transition-all whitespace-nowrap">
             {actionLabel[order.status]}
           </button>
-          <button className="w-9 h-9 border border-[var(--color-border)] rounded-xl flex items-center justify-center hover:border-[var(--color-primary)] hover:bg-blue-100 transition-all">
+          <button
+            onClick={() => navigate(`/order/${order.id}`)}
+            className="w-9 h-9 border border-[var(--color-border)] cursor-pointer rounded-xl flex items-center justify-center hover:border-[var(--color-primary)] hover:bg-blue-100 transition-all">
             <ChevronRight className="w-4 h-4 text-[var(--color-text-secondary)]" />
           </button>
         </div>

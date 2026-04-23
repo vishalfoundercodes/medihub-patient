@@ -9,8 +9,10 @@ import Stats from '../components/Stats';
 import Newsletter from '../components/Newsletter';
 import Footer from '../components/Footer';
 import Container from '../components/Container';
+import { useNavigate } from 'react-router-dom';
 
 export default function Home() {
+  const navigate=useNavigate()
   return (
     <div className="bg-[var(--color-bg-main)]">
       <Navbar />
@@ -21,18 +23,18 @@ export default function Home() {
 
       <HighlightBanner />
       <Features />
-      <Container className="py-2 grid lg:grid-cols-2 gap-8">
-        <div>
-          <div className="flex items-center justify-between mb-8">
+      <Container className="py-2 grid lg:grid-cols-2 gap-8 ">
+        <div className="bg-blue-100 p-3 rounded-xl">
+          <div className="flex items-center justify-between mb-4 ">
             <h2 className="text-xl font-bold text-[var(--color-text-dark)]">
               Popular Lab Tests
             </h2>
-            <a
-              href="#"
-              className="text-[var(--color-primary)] font-medium hover:underline"
+            <button
+              className="text-[var(--color-primary)] cursor-pointer font-medium hover:underline"
+              onClick={() => navigate("/lab-tests")}
             >
               View All
-            </a>
+            </button>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             {[
@@ -97,17 +99,17 @@ export default function Home() {
           </div>
         </div>
 
-        <div>
-          <div className="flex items-center justify-between mb-8">
+        <div className="bg-blue-100 p-3 rounded-xl">
+          <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-[var(--color-text-dark)]">
               Top Doctors
             </h2>
-            <a
-              href="#"
-              className="text-[var(--color-primary)] font-medium hover:underline"
+            <button
+              className="text-[var(--color-primary)] cursor-pointer font-medium hover:underline"
+              onClick={() => navigate("/doctors")}
             >
               View All
-            </a>
+            </button>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             {[

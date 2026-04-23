@@ -1,7 +1,9 @@
 import { TestTube, Pill, Users, ShieldCheck, MessageCircle } from 'lucide-react';
 import Container from './Container';
+import { useNavigate } from 'react-router-dom';
 
 export default function Features() {
+  const navigate=useNavigate()
   const features = [
     {
       icon: TestTube,
@@ -70,7 +72,10 @@ export default function Features() {
                 <p className="text-sm text-[var(--color-text-secondary)]">
                   Our support team is ready to assist you.
                 </p>
-                <button className="bg-[var(--color-primary)] text-white mt-2 px-3 whitespace-nowrap py-1 rounded-lg font-medium hover:bg-[var(--color-primary-dark)] flex items-center gap-2 shrink-0">
+                <button
+                  className="bg-[var(--color-primary)] cursor-pointer text-white mt-2 px-3 whitespace-nowrap py-1 rounded-lg font-medium hover:bg-[var(--color-primary-dark)] flex items-center gap-2 shrink-0"
+                  onClick={() => navigate("/help-support")}
+                >
                   <MessageCircle className="w-4 h-4" />
                   Contact Support
                 </button>
@@ -82,6 +87,6 @@ export default function Features() {
           </div>
         </div>
       </Container>
-      </section>
+    </section>
   );
 }

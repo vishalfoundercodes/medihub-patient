@@ -30,6 +30,7 @@ export default function AccountSidebar({ active, onChange }) {
     if (id === 'appointments') { navigate('/appointments'); return; }
     if (id === 'notifications') { navigate('/notifications'); return; }
     if (id === 'help') { navigate('/help-support'); return; }
+    if (id === 'addresses') { navigate('/my-addresses'); return; }
     onChange(id);
   };
 

@@ -1,0 +1,108 @@
+import labHero from '../assets/Home/labHero.png';
+import doctorImg from '../assets/Home/doctorHero.png';
+
+export const ORDER_DETAILS = {
+  'MC123456': {
+    id: 'MC123456', type: 'Medicines', date: 'May 10, 2024', amount: 598,
+    status: 'Delivered', items: 3,
+    deliveryLabel: 'Delivered on', deliveryDate: 'May 12, 2024',
+    placedOn: 'May 10, 2024 at 11:30 AM',
+    paymentMethod: 'UPI (GPay)',
+    paymentStatus: 'Paid',
+    address: { name: 'Rahul Kumar', phone: '+91 98765 43210', line: 'A-45, 2nd Floor, Green Park Extension', city: 'New Delhi', pincode: '110016' },
+    products: [
+      { name: 'Crocin 650mg Tablet', qty: 2, price: 120, image: labHero, strip: 'Strip of 15 Tablets' },
+      { name: 'Dolo 650mg Tablet', qty: 1, price: 135, image: labHero, strip: 'Strip of 15 Tablets' },
+      { name: 'Vitamin D3 60K Capsule', qty: 1, price: 96, image: labHero, strip: 'Strip of 4 Capsules' },
+    ],
+    pricing: { subtotal: 471, discount: 0, delivery: 0, total: 598 },
+    timeline: [
+      { label: 'Order Placed', date: 'May 10, 2024 at 11:30 AM', done: true },
+      { label: 'Payment Confirmed', date: 'May 10, 2024 at 11:31 AM', done: true },
+      { label: 'Order Packed', date: 'May 11, 2024 at 09:00 AM', done: true },
+      { label: 'Out for Delivery', date: 'May 12, 2024 at 08:00 AM', done: true },
+      { label: 'Delivered', date: 'May 12, 2024 at 02:30 PM', done: true },
+    ],
+  },
+  'MC123455': {
+    id: 'MC123455', type: 'Lab Test', date: 'May 08, 2024', amount: 998,
+    status: 'Completed', items: 1,
+    deliveryLabel: 'Completed on', deliveryDate: 'May 08, 2024',
+    placedOn: 'May 07, 2024 at 03:15 PM',
+    paymentMethod: 'Credit Card',
+    paymentStatus: 'Paid',
+    address: { name: 'Rahul Kumar', phone: '+91 98765 43210', line: 'A-45, 2nd Floor, Green Park Extension', city: 'New Delhi', pincode: '110016' },
+    products: [
+      { name: 'Full Body Checkup', qty: 1, price: 998, image: labHero, strip: 'Includes 70+ Tests' },
+    ],
+    pricing: { subtotal: 1499, discount: 501, delivery: 0, total: 998 },
+    timeline: [
+      { label: 'Test Booked', date: 'May 07, 2024 at 03:15 PM', done: true },
+      { label: 'Payment Confirmed', date: 'May 07, 2024 at 03:16 PM', done: true },
+      { label: 'Sample Collected', date: 'May 08, 2024 at 07:30 AM', done: true },
+      { label: 'Report Generated', date: 'May 08, 2024 at 06:00 PM', done: true },
+      { label: 'Report Delivered', date: 'May 08, 2024 at 06:05 PM', done: true },
+    ],
+  },
+  'MC123454': {
+    id: 'MC123454', type: 'Medicines', date: 'May 05, 2024', amount: 1249,
+    status: 'Shipped', items: 2,
+    deliveryLabel: 'Expected Delivery', deliveryDate: 'May 07, 2024',
+    placedOn: 'May 05, 2024 at 08:45 AM',
+    paymentMethod: 'Debit Card',
+    paymentStatus: 'Paid',
+    address: { name: 'Rahul Kumar', phone: '+91 98765 43210', line: 'A-45, 2nd Floor, Green Park Extension', city: 'New Delhi', pincode: '110016' },
+    products: [
+      { name: 'Augmentin 625mg Tablet', qty: 1, price: 276, image: labHero, strip: 'Strip of 10 Tablets' },
+      { name: 'Himalaya Liv.52 DS Tablet', qty: 2, price: 173, image: labHero, strip: 'Bottle of 60 Tablets' },
+    ],
+    pricing: { subtotal: 1249, discount: 0, delivery: 0, total: 1249 },
+    timeline: [
+      { label: 'Order Placed', date: 'May 05, 2024 at 08:45 AM', done: true },
+      { label: 'Payment Confirmed', date: 'May 05, 2024 at 08:46 AM', done: true },
+      { label: 'Order Packed', date: 'May 06, 2024 at 10:00 AM', done: true },
+      { label: 'Shipped', date: 'May 06, 2024 at 04:00 PM', done: true },
+      { label: 'Out for Delivery', date: 'May 07, 2024', done: false, active: true },
+    ],
+  },
+  'MC123453': {
+    id: 'MC123453', type: 'Lab Test', date: 'May 03, 2024', amount: 649,
+    status: 'Processing', items: 1,
+    deliveryLabel: 'Expected on', deliveryDate: 'May 06, 2024',
+    placedOn: 'May 03, 2024 at 05:20 PM',
+    paymentMethod: 'UPI',
+    paymentStatus: 'Paid',
+    address: { name: 'Rahul Kumar', phone: '+91 98765 43210', line: 'A-45, 2nd Floor, Green Park Extension', city: 'New Delhi', pincode: '110016' },
+    products: [
+      { name: 'Thyroid Profile', qty: 1, price: 649, image: labHero, strip: 'Includes T3, T4, TSH' },
+    ],
+    pricing: { subtotal: 899, discount: 250, delivery: 0, total: 649 },
+    timeline: [
+      { label: 'Test Booked', date: 'May 03, 2024 at 05:20 PM', done: true },
+      { label: 'Payment Confirmed', date: 'May 03, 2024 at 05:21 PM', done: true },
+      { label: 'Sample Collection Scheduled', date: 'May 06, 2024 at 07:00 AM', done: false, active: true },
+      { label: 'Report Generation', date: '—', done: false },
+      { label: 'Report Delivered', date: '—', done: false },
+    ],
+  },
+  'MC123452': {
+    id: 'MC123452', type: 'Appointment', date: 'Apr 30, 2024', amount: 500,
+    status: 'Confirmed', items: 1,
+    deliveryLabel: 'Appointment on', deliveryDate: 'May 02, 2024 at 04:00 PM',
+    placedOn: 'Apr 30, 2024 at 10:00 AM',
+    paymentMethod: 'UPI',
+    paymentStatus: 'Paid',
+    address: { name: 'Dr. Priya Sharma', phone: 'Max Super Speciality Hospital', line: 'Saket, New Delhi', city: 'New Delhi', pincode: '110017' },
+    products: [
+      { name: 'Consultation - Dr. Priya Sharma', qty: 1, price: 500, image: doctorImg, strip: 'Gynecologist • In-Clinic Visit' },
+    ],
+    pricing: { subtotal: 500, discount: 0, delivery: 0, total: 500 },
+    timeline: [
+      { label: 'Appointment Booked', date: 'Apr 30, 2024 at 10:00 AM', done: true },
+      { label: 'Payment Confirmed', date: 'Apr 30, 2024 at 10:01 AM', done: true },
+      { label: 'Appointment Confirmed', date: 'Apr 30, 2024 at 10:05 AM', done: true },
+      { label: 'Appointment Scheduled', date: 'May 02, 2024 at 04:00 PM', done: false, active: true },
+      { label: 'Consultation Completed', date: '—', done: false },
+    ],
+  },
+};

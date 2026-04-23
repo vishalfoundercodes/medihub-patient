@@ -1,21 +1,50 @@
 import { FlaskConical, Calendar, FileText, MapPin, CreditCard, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const actions = [
-  { icon: FlaskConical, title: 'My Lab Tests', desc: 'View all your lab tests', color: 'text-[var(--color-primary)]', bg: 'bg-blue-50' },
-  { icon: Calendar, title: 'My Appointments', desc: 'View upcoming appointments', color: 'text-purple-600', bg: 'bg-purple-50' },
-  { icon: FileText, title: 'My Reports', desc: 'Download your reports', color: 'text-teal-600', bg: 'bg-teal-50' },
-  { icon: MapPin, title: 'My Addresses', desc: 'Manage your addresses', color: 'text-orange-500', bg: 'bg-orange-50' },
-  { icon: CreditCard, title: 'Payment Methods', desc: 'Manage cards & payments', color: 'text-green-600', bg: 'bg-green-50' },
+  {
+    icon: FlaskConical,
+    title: "My Lab Tests",
+    desc: "View all your lab tests",
+    route: "/my-lab-tests",
+    color: "text-[var(--color-primary)]",
+    bg: "bg-blue-50",
+  },
+  {
+    icon: Calendar,
+    title: "My Appointments",
+    desc: "View upcoming appointments",
+    route: "/appointments",
+    color: "text-purple-600",
+    bg: "bg-purple-50",
+  },
+  {
+    icon: FileText,
+    title: "My Reports",
+    desc: "Download your reports",
+    route: "/orders",
+    color: "text-teal-600",
+    bg: "bg-teal-50",
+  },
+  {
+    icon: MapPin,
+    title: "My Addresses",
+    desc: "Manage your addresses",
+    route: "/my-addresses",
+    color: "text-orange-500",
+    bg: "bg-orange-50",
+  },
 ];
 
 export default function AccountQuickActions() {
+  const navigate=useNavigate()
   return (
     <div className="bg-white rounded-2xl border border-[var(--color-border)] p-6">
       <h3 className="font-bold text-[var(--color-text-dark)] mb-5">
         Quick Actions
       </h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-        {actions.map(({ icon: Icon, title, desc, color, bg }) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {actions.map(({ icon: Icon, title, desc, color, bg, route }) => (
           <button
             key={title}
             className="flex flex-col justify-between p-2 rounded-2xl border border-[var(--color-border)] hover:border-blue-200 hover:shadow-md transition-all group text-left h-full"
@@ -41,7 +70,8 @@ export default function AccountQuickActions() {
             {/* Bottom Arrow */}
             <div className="flex justify-end mt-0">
               <ArrowRight
-                className={`w-5 h-5 ${color} group-hover:translate-x-1 transition-transform`}
+                className={`w-5 h-5 ${color} group-hover:translate-x-1 transition-transform cursor-pointer`}
+                onClick={() => navigate(`${route}`)}
               />
             </div>
           </button>

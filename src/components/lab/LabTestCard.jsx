@@ -1,9 +1,19 @@
-import { useState } from 'react';
 import { Heart, Home } from 'lucide-react';
+import { useWishlist } from '../../context/WishlistContext';
 
 export default function LabTestCard({ test, onAdd, isSelected }) {
-  const [wished, setWished] = useState(false);
+  const { toggleWishlist, isWishlisted } = useWishlist();
+  const wished = isWishlisted(test.id, 'test');
   const saved = test.original - test.price;
+
+  const handleWishlist = (e) => {
+    e.stopPropagation();
+    toggleWishlist({
+      id: test.id, name: test.name, category: 'test',
+      image: test.image, price: test.price, original: test.original,
+      discount: test.discount, includes: test.includes,
+    });
+  };
 
   return (
     <div
@@ -23,7 +33,7 @@ export default function LabTestCard({ test, onAdd, isSelected }) {
         </span>
         {/* Wishlist */}
         <button
-          onClick={() => setWished(!wished)}
+          onClick={handleWishlist}
           className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform"
         >
           <Heart

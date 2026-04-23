@@ -1,10 +1,21 @@
-import { useState } from 'react';
 import { Heart, Star, Video, Building2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useWishlist } from '../../context/WishlistContext';
 
 export default function DoctorCard({ doctor }) {
-  const [wished, setWished] = useState(false);
+  const { toggleWishlist, isWishlisted } = useWishlist();
+  const wished = isWishlisted(doctor.id, 'doctor');
   const navigate = useNavigate();
+
+  const handleWishlist = (e) => {
+    e.stopPropagation();
+    toggleWishlist({
+      id: doctor.id, name: doctor.name, category: 'doctor',
+      image: doctor.image, specialty: doctor.specialty,
+      experience: doctor.experience, rating: doctor.rating,
+      reviews: doctor.reviews, fee: doctor.fee,
+    });
+  };
 
   return (
     <div className="bg-white rounded-2xl border border-[var(--color-border)] hover:border-blue-200 hover:shadow-lg transition-all duration-200 overflow-hidden group">
@@ -16,7 +27,7 @@ export default function DoctorCard({ doctor }) {
           className="w-full h-32 object-cover object-top group-hover:scale-105 transition-transform duration-300"
         />
         <button
-          onClick={() => setWished(!wished)}
+          onClick={handleWishlist}
           className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform"
         >
           <Heart className={`w-4 h-4 transition-colors ${wished ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />

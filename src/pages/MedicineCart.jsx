@@ -146,7 +146,7 @@ export default function MedicineCart() {
           <div className="lg:col-span-2 space-y-6">
 
             {/* Cart Items */}
-            <div className="bg-white rounded-2xl border border-[var(--color-border)] p-6">
+            <div className="bg-white rounded-2xl border border-[var(--color-border)] p-2 md:p-4">
               <h3 className="font-bold text-[var(--color-text-dark)] mb-5">Cart Items</h3>
               <div className="space-y-4">
                 {cartItems.map(({ med, qty }) => (
@@ -161,17 +161,17 @@ export default function MedicineCart() {
                         <span className="text-xs font-semibold text-[var(--color-success)] bg-green-50 px-2 py-0.5 rounded-full">{med.discount}% OFF</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 shrink-0">
+                    <div className="flex flex-col md:flex-row items-center gap-3 shrink-0">
                       <div className="flex items-center border border-[var(--color-primary)] rounded-xl overflow-hidden">
-                        <button onClick={() => updateQty(String(med.id), -1)} className="px-3 py-2 text-[var(--color-primary)] hover:bg-blue-50 transition-colors">
+                        <button onClick={() => updateQty(String(med.id), -1)} className="px-3 py-2 cursor-pointer text-[var(--color-primary)] hover:bg-blue-50 transition-colors">
                           <Minus className="w-3.5 h-3.5" />
                         </button>
                         <span className="px-3 font-bold text-sm text-[var(--color-text-dark)]">{qty}</span>
-                        <button onClick={() => updateQty(String(med.id), 1)} className="px-3 py-2 text-[var(--color-primary)] hover:bg-blue-50 transition-colors">
+                        <button onClick={() => updateQty(String(med.id), 1)} className="px-3 py-2 cursor-pointer text-[var(--color-primary)] hover:bg-blue-50 transition-colors">
                           <Plus className="w-3.5 h-3.5" />
                         </button>
                       </div>
-                      <button onClick={() => removeItem(med.id)} className="w-8 h-8 rounded-xl hover:bg-red-50 flex items-center justify-center transition-colors">
+                      <button onClick={() => removeItem(med.id)} className="w-8 h-8 cursor-pointer rounded-xl hover:bg-red-50 flex items-center justify-center transition-colors">
                         <Trash2 className="w-4 h-4 text-[var(--color-text-secondary)] hover:text-red-500" />
                       </button>
                     </div>
@@ -250,7 +250,9 @@ export default function MedicineCart() {
                     </div>
                   </div>
                 ))}
-                <button className="w-full border-2 border-dashed border-[var(--color-border)] hover:border-[var(--color-primary)] text-sm font-semibold text-[var(--color-primary)] py-3 rounded-xl transition-all hover:bg-blue-50">
+                <button className="w-full border-2 border-dashed border-[var(--color-border)] hover:border-[var(--color-primary)] text-sm font-semibold text-[var(--color-primary)] py-3 rounded-xl transition-all hover:bg-blue-50"
+                onClick={()=>navigate("/address")}
+                >
                   + Add New Address
                 </button>
               </div>

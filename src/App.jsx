@@ -1,5 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { WishlistProvider } from './context/WishlistContext';
+import { CartProvider } from './context/CartContext';
+import Wishlist from './pages/Wishlist';
 import Home from './pages/Home';
 import LabTests from './pages/LabTests';
 import Medicines from './pages/Medicines';
@@ -16,6 +19,9 @@ import HelpSupport from './pages/HelpSupport';
 import LabCheckout from './pages/LabCheckout';
 import BookAppointment from './pages/BookAppointment';
 import MedicineCart from './pages/MedicineCart';
+import MyAddresses from './pages/MyAddresses';
+import OrderDetail from './pages/OrderDetail';
+import Search from './pages/Search';
 import LoginModal from './components/LoginModal';
 import './index.css';
 
@@ -41,6 +47,10 @@ function AppContent() {
         <Route path="/lab-checkout" element={<LabCheckout />} />
         <Route path="/book-appointment/:id" element={<BookAppointment />} />
         <Route path="/medicine-cart" element={<MedicineCart />} />
+        <Route path="/my-addresses" element={<MyAddresses />} />
+        <Route path="/order/:id" element={<OrderDetail />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/wishlist" element={<Wishlist />} />
       </Routes>
     </>
   );
@@ -50,7 +60,11 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <WishlistProvider>
+          <CartProvider>
         <AppContent />
+          </CartProvider>
+        </WishlistProvider>
       </AuthProvider>
     </BrowserRouter>
   );

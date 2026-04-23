@@ -1,9 +1,19 @@
-import { useState } from 'react';
 import { Heart, ShoppingCart, Plus, Minus } from 'lucide-react';
+import { useWishlist } from '../../context/WishlistContext';
 
 export default function MedicineCard({ medicine, onAdd, onRemove, qty }) {
-  const [wished, setWished] = useState(false);
+  const { toggleWishlist, isWishlisted } = useWishlist();
+  const wished = isWishlisted(medicine.id, 'medicine');
   const saved = medicine.original - medicine.price;
+
+  const handleWishlist = (e) => {
+    e.stopPropagation();
+    toggleWishlist({
+      id: medicine.id, name: medicine.name, category: 'medicine',
+      image: medicine.image, price: medicine.price, original: medicine.original,
+      discount: medicine.discount, strip: medicine.strip,
+    });
+  };
 
   return (
     <div className="bg-white rounded-2xl border border-[var(--color-border)] hover:border-blue-200 hover:shadow-lg transition-all duration-200 overflow-hidden group">
@@ -18,7 +28,7 @@ export default function MedicineCard({ medicine, onAdd, onRemove, qty }) {
           {medicine.discount}% OFF
         </span>
         <button
-          onClick={() => setWished(!wished)}
+          onClick={handleWishlist}
           className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform"
         >
           <Heart

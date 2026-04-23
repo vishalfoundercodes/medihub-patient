@@ -1,6 +1,30 @@
 import { Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import medihubLogo from "../assets/medihubLogo.png";
 import Container from './Container';
+
+const QUICK_LINKS = [
+  { label: 'Home',      to: '/'          },
+  { label: 'Tests',     to: '/lab-tests' },
+  { label: 'Medicines', to: '/medicines' },
+  { label: 'Doctors',   to: '/doctors'   },
+  { label: 'Wishlist',  to: '/wishlist'  },
+];
+
+const COMPANY_LINKS = [
+  { label: 'Help & Support', to: '/help-support' },
+  { label: 'My Account',     to: '/account'      },
+];
+
+const CUSTOMER_CARE_LINKS = [
+  { label: 'My Orders',    to: '/orders'       },
+  { label: 'Notifications',to: '/notifications'},
+];
+
+const POLICY_LINKS = [
+  { label: 'Privacy Policy',    to: '/help-support' },
+  { label: 'Terms & Conditions',to: '/help-support' },
+];
 
 export default function Footer() {
   return (
@@ -33,84 +57,44 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="font-bold text-[var(--color-text-dark)] mb-4">
-              Quick Links
-            </h4>
+            <h4 className="font-bold text-[var(--color-text-dark)] mb-4">Quick Links</h4>
             <ul className="space-y-2 text-sm text-[var(--color-text-secondary)]">
-              {[
-                "Home",
-                "Tests",
-                "Medicines",
-                "Doctors",
-                "Health Tips",
-                "Offers",
-              ].map((link) => (
-                <li key={link}>
-                  <a href="#" className="hover:text-[var(--color-primary)]">
-                    {link}
-                  </a>
+              {QUICK_LINKS.map(({ label, to }) => (
+                <li key={label}>
+                  <Link to={to} className="hover:text-[var(--color-primary)] transition-colors">{label}</Link>
                 </li>
               ))}
             </ul>
           </div>
 
           <div>
-            <h4 className="font-bold text-[var(--color-text-dark)] mb-4">
-              Company
-            </h4>
+            <h4 className="font-bold text-[var(--color-text-dark)] mb-4">Company</h4>
             <ul className="space-y-2 text-sm text-[var(--color-text-secondary)]">
-              {[
-                "About Us",
-                "Contact Us",
-                "Careers",
-                "Blog",
-                "Partner With Us",
-              ].map((link) => (
-                <li key={link}>
-                  <a href="#" className="hover:text-[var(--color-primary)]">
-                    {link}
-                  </a>
+              {COMPANY_LINKS.map(({ label, to }) => (
+                <li key={label}>
+                  <Link to={to} className="hover:text-[var(--color-primary)] transition-colors">{label}</Link>
                 </li>
               ))}
             </ul>
           </div>
 
           <div>
-            <h4 className="font-bold text-[var(--color-text-dark)] mb-4">
-              Customer Care
-            </h4>
+            <h4 className="font-bold text-[var(--color-text-dark)] mb-4">Customer Care</h4>
             <ul className="space-y-2 text-sm text-[var(--color-text-secondary)]">
-              {[
-                "Help Center",
-                "Track Order",
-                "FAQs",
-                "Cancellation Policy",
-                "Refund Policy",
-              ].map((link) => (
-                <li key={link}>
-                  <a href="#" className="hover:text-[var(--color-primary)]">
-                    {link}
-                  </a>
+              {CUSTOMER_CARE_LINKS.map(({ label, to }) => (
+                <li key={label}>
+                  <Link to={to} className="hover:text-[var(--color-primary)] transition-colors">{label}</Link>
                 </li>
               ))}
             </ul>
           </div>
 
           <div>
-            <h4 className="font-bold text-[var(--color-text-dark)] mb-4">
-              Policies
-            </h4>
+            <h4 className="font-bold text-[var(--color-text-dark)] mb-4">Policies</h4>
             <ul className="space-y-2 text-sm text-[var(--color-text-secondary)] mb-6">
-              {[
-                "Privacy Policy",
-                "Terms & Conditions",
-                "Shipping Policy",
-                "Payment Policy",
-              ].map((link) => (
-                <li key={link}>
-                  <a href="#" className="hover:text-[var(--color-primary)]">
-                    {link}
-                  </a>
+              {POLICY_LINKS.map(({ label, to }) => (
+                <li key={label}>
+                  <Link to={to} className="hover:text-[var(--color-primary)] transition-colors">{label}</Link>
                 </li>
               ))}
             </ul>

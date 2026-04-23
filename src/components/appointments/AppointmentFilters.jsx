@@ -15,7 +15,7 @@ export default function AppointmentFilters({ active, onChange }) {
           <button
             key={id}
             onClick={() => onChange(id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border transition-all
+            className={`flex items-center gap-2 px-4 py-2 cursor-pointer rounded-xl text-sm font-medium border transition-all
               ${active === id
                 ? 'bg-[var(--color-primary)] text-white border-[var(--color-primary)] shadow-md shadow-blue-100'
                 : 'bg-white text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]'
@@ -26,11 +26,11 @@ export default function AppointmentFilters({ active, onChange }) {
           </button>
         ))}
       </div>
-      <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border border-[var(--color-border)] bg-white text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-all">
+      {/* <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border border-[var(--color-border)] bg-white text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-all">
         <SlidersHorizontal className="w-4 h-4" />
         Filter
         <ChevronDown className="w-3.5 h-3.5" />
-      </button>
+      </button> */}
     </div>
   );
 }

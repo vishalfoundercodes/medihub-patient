@@ -1,7 +1,9 @@
 import { TestTube, Pill, Calendar, ArrowRight } from "lucide-react";
 import Container from "./Container";
+import { useNavigate } from "react-router-dom";
 
 export default function QuickActions() {
+  const navigate = useNavigate()
   const actions = [
     {
       icon: TestTube,
@@ -10,6 +12,7 @@ export default function QuickActions() {
       bg: "bg-blue-100",
       iconColor: "text-[var(--color-primary)]",
       btnBg: "bg-[var(--color-primary)]",
+      route: "/lab-tests",
     },
     {
       icon: Pill,
@@ -18,6 +21,7 @@ export default function QuickActions() {
       bg: "bg-teal-100",
       iconColor: "text-teal-500",
       btnBg: "bg-teal-500",
+      route: "/medicines",
     },
     {
       icon: Calendar,
@@ -26,6 +30,7 @@ export default function QuickActions() {
       bg: "bg-purple-100",
       iconColor: "text-purple-500",
       btnBg: "bg-purple-500",
+      route: "/doctors",
     },
   ];
 
@@ -49,7 +54,8 @@ export default function QuickActions() {
                   {action.desc}
                 </p>
                 <button
-                  className={`${action.btnBg} text-white w-8 h-8 rounded-full flex items-center justify-center hover:opacity-90`}
+                  className={`${action.btnBg} text-white w-8 h-8 cursor-pointer rounded-full flex items-center justify-center hover:opacity-90`}
+                  onClick={() => navigate(`${action.route}`)}
                 >
                   <ArrowRight className="w-4 h-4" />
                 </button>

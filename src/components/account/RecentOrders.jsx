@@ -1,5 +1,6 @@
 import { ShoppingBag, FlaskConical } from 'lucide-react';
 import { MOCK_ORDERS } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const statusStyle = {
   Delivered: 'bg-green-100 text-[var(--color-success)]',
@@ -9,11 +10,14 @@ const statusStyle = {
 };
 
 export default function RecentOrders() {
+  const navigate=useNavigate()
   return (
     <div className="bg-white rounded-2xl border border-[var(--color-border)] p-4">
       <div className="flex items-center justify-between mb-5">
         <h3 className="font-bold text-[var(--color-text-dark)]">Recent Orders</h3>
-        <button className="text-sm font-semibold text-[var(--color-primary)] hover:underline">View All</button>
+        <button className="text-sm font-semibold text-[var(--color-primary)] cursor-pointer hover:underline"
+        onClick={()=>navigate("/orders")}
+        >View All</button>
       </div>
 
       <div className="space-y-3">

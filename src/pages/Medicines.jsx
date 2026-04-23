@@ -10,6 +10,7 @@ import MedicineGrid from '../components/medicines/MedicineGrid';
 import MedicineTrustBar from '../components/medicines/MedicineTrustBar';
 import { medicines } from '../data/medicinesData';
 import Container from '../components/Container';
+import { useCart } from '../context/CartContext';
 
 const defaultFilters = {
   categories: ['All Categories'],
@@ -23,9 +24,9 @@ export default function Medicines() {
   const [activeTab, setActiveTab] = useState('All Categories');
   const [filters, setFilters] = useState(defaultFilters);
   const [searchQuery, setSearchQuery] = useState('');
-  const [cart, setCart] = useState({});
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const navigate = useNavigate();
+  const { cart, addToCart, removeFromCart, cartCount, cartTotal } = useCart();
 
   const handleFilterChange = (type, value) => {
     setFilters((prev) => {
@@ -45,23 +46,9 @@ export default function Medicines() {
     });
   };
 
-  const handleAdd = (medicine) => {
-    setCart((prev) => ({ ...prev, [medicine.id]: (prev[medicine.id] || 0) + 1 }));
-  };
+  const handleAdd = (medicine) => addToCart(medicine);
 
-  const handleRemove = (id) => {
-    setCart((prev) => {
-      const qty = (prev[id] || 0) - 1;
-      if (qty <= 0) { const next = { ...prev }; delete next[id]; return next; }
-      return { ...prev, [id]: qty };
-    });
-  };
-
-  const cartCount = Object.values(cart).reduce((a, b) => a + b, 0);
-  const cartTotal = Object.entries(cart).reduce((sum, [id, qty]) => {
-    const med = medicines.find((m) => m.id === Number(id));
-    return sum + (med ? med.price * qty : 0);
-  }, 0);
+  const handleRemove = (id) => removeFromCart(id);
 
   const filtered = useMemo(() => {
     let result = [...medicines];

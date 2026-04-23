@@ -40,7 +40,7 @@ export default function Hero() {
   const tab = searchTabs.find((t) => t.id === activeTab);
 
   const handleSearch = () => {
-    navigate(tab.to);
+    navigate(`/search?q=${encodeURIComponent(query)}&type=${activeTab}`);
   };
 
   return (
@@ -86,6 +86,7 @@ export default function Hero() {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
+                onFocus={() => navigate(`/search?q=${encodeURIComponent(query)}&type=${activeTab}`)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 placeholder={tab.placeholder}
                 className="w-full pl-11 pr-4 py-3 bg-[var(--color-bg-section)] rounded-xl border border-[var(--color-border)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:bg-white transition-all"

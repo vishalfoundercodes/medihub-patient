@@ -82,40 +82,70 @@ export default function MyAddresses() {
           {addresses.map((addr) => {
             const Icon = TYPE_ICONS[addr.type] || MoreHorizontal;
             return (
-              <div key={addr.id} className={`bg-white rounded-2xl border-2 p-5 transition-all ${addr.isDefault ? 'border-[var(--color-primary)]' : 'border-[var(--color-border)]'}`}>
+              <div
+                key={addr.id}
+                className={`bg-white rounded-2xl border-2 p-1 transition-all ${addr.isDefault ? "border-[var(--color-primary)]" : "border-[var(--color-border)]"}`}
+              >
                 {/* Top row */}
-                <div className="flex items-start justify-between mb-3">
+                <div className="flex items-start justify-between mb-3 p-2">
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
                       <Icon className="w-4 h-4 text-[var(--color-primary)]" />
                     </div>
-                    <span className="font-bold text-sm text-[var(--color-text-dark)]">{addr.type}</span>
+                    <span className="font-bold text-sm text-[var(--color-text-dark)]">
+                      {addr.type}
+                    </span>
                     {addr.isDefault && (
-                      <span className="text-[10px] font-bold text-[var(--color-primary)] bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full">Default</span>
+                      <span className="text-[10px] font-bold text-[var(--color-primary)] bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full">
+                        Default
+                      </span>
                     )}
                   </div>
                 </div>
 
                 {/* Address details */}
-                <p className="text-sm font-semibold text-[var(--color-text-dark)] mb-0.5">{addr.name}</p>
-                <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed mb-0.5">{addr.line1}{addr.line2 ? `, ${addr.line2}` : ''}</p>
-                <p className="text-xs text-[var(--color-text-secondary)]">{addr.city}, {addr.state} - {addr.pincode}</p>
-                <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">📞 +91 {addr.phone}</p>
+                <div className="px-4">
+                  <p className="text-sm font-semibold text-[var(--color-text-dark)] mb-0.5">
+                    {addr.name}
+                  </p>
+                  <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed mb-0.5 ">
+                    {addr.line1}
+                    {addr.line2 ? `, ${addr.line2}` : ""}
+                  </p>
+                  <p className="text-xs text-[var(--color-text-secondary)]">
+                    {addr.city}, {addr.state} - {addr.pincode}
+                  </p>
+                  <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">
+                    📞 +91 {addr.phone}
+                  </p>
+                </div>
 
                 {/* Actions */}
                 <div className="flex items-center gap-2 mt-4 pt-3 border-t border-[var(--color-border)]">
-                  <button onClick={() => openView(addr)} className="flex items-center gap-1.5 text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-all">
+                  <button
+                    onClick={() => openView(addr)}
+                    className="flex items-center gap-1.5 text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-all"
+                  >
                     <MapPin className="w-3.5 h-3.5" /> View
                   </button>
-                  <button onClick={() => openEdit(addr)} className="flex items-center gap-1.5 text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-all">
+                  <button
+                    onClick={() => openEdit(addr)}
+                    className="flex items-center gap-1.5 text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-all"
+                  >
                     <Pencil className="w-3.5 h-3.5" /> Edit
                   </button>
                   {!addr.isDefault && (
-                    <button onClick={() => setDefault(addr.id)} className="flex items-center gap-1.5 text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-all">
+                    <button
+                      onClick={() => setDefault(addr.id)}
+                      className="flex items-center gap-1.5 text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-all"
+                    >
                       <Check className="w-3.5 h-3.5" /> Set Default
                     </button>
                   )}
-                  <button onClick={() => handleDelete(addr.id)} className="ml-auto flex items-center gap-1.5 text-xs font-semibold text-[var(--color-text-secondary)] hover:text-red-500 px-3 py-1.5 rounded-lg hover:bg-red-50 transition-all">
+                  <button
+                    onClick={() => handleDelete(addr.id)}
+                    className="ml-auto flex items-center gap-1.5 text-xs font-semibold text-[var(--color-text-secondary)] hover:text-red-500 px-3 py-1.5 rounded-lg hover:bg-red-50 transition-all"
+                  >
                     <Trash2 className="w-3.5 h-3.5" /> Delete
                   </button>
                 </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { MapPin, Bell, ChevronDown, Menu, X, LogIn, User, LogOut } from 'lucide-react';
+import { MapPin, Bell, ChevronDown, Menu, X, LogIn, User, LogOut, Heart } from 'lucide-react';
+import { useWishlist } from '../context/WishlistContext';
 import medihubLogo from "../assets/medihubLogo.png";
 import Container from './Container';
 import { useAuth } from '../context/AuthContext';
@@ -10,6 +11,7 @@ import { useAuth } from '../context/AuthContext';
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, logout, setShowLogin } = useAuth();
+  const { items: wishlistItems } = useWishlist();
   const navigate = useNavigate();
 
   const navLinks = [
@@ -17,6 +19,7 @@ export default function Navbar() {
     { label: "Tests", to: "/lab-tests" },
     { label: "Medicines", to: "/medicines" },
     { label: "Doctors", to: "/doctors" },
+    { label: "Wishlist", to: "/wishlist" },
     ...(user ? [{ label: "Account", to: "/account" }] : []),
   ];
   
@@ -26,7 +29,7 @@ export default function Navbar() {
       <div className="border-b border-[var(--color-border)]">
         <Container className="py-3 flex items-center justify-between">
           {/* Logo */}
-          <a href="#" className="flex items-center gap-2.5 shrink-0">
+          <a href="/" className="flex items-center gap-2.5 shrink-0">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-blue-200">
               {/* <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 3a1 1 0 0 1 1 1v3h3a1 1 0 0 1 0 2h-3v3a1 1 0 0 1-2 0v-3H8a1 1 0 0 1 0-2h3V7a1 1 0 0 1 1-1z"/>
@@ -91,10 +94,23 @@ export default function Navbar() {
               </div>
             </button>
 
+            {/* Wishlist */}
+            <button
+              onClick={() => navigate('/wishlist')}
+              className="relative w-9 h-9 flex items-center justify-center rounded-xl border border-[var(--color-border)] hover:border-red-300 hover:bg-red-50 transition-all"
+            >
+              <Heart className="w-4 h-4 text-[var(--color-text-secondary)] hover:text-red-500" />
+              {wishlistItems.length > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  {wishlistItems.length > 9 ? '9+' : wishlistItems.length}
+                </span>
+              )}
+            </button>
+
             {/* Bell */}
             <button
               onClick={() => navigate("/notifications")}
-              className="relative w-9 h-9 flex items-center justify-center rounded-xl border border-[var(--color-border)] hover:border-[var(--color-primary)] hover:bg-blue-50 transition-all"
+              className="relative w-9 h-9 flex items-center cursor-pointer justify-center rounded-xl border border-[var(--color-border)] hover:border-[var(--color-primary)] hover:bg-blue-50 transition-all"
             >
               <Bell className="w-4.5 h-4.5 text-[var(--color-text-secondary)]" />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
@@ -117,7 +133,7 @@ export default function Navbar() {
                 </button>
                 <button
                   onClick={logout}
-                  className="flex items-center gap-1.5 text-sm font-medium text-[var(--color-text-secondary)] hover:text-red-500 px-3 py-2 rounded-xl hover:bg-red-50 transition-all"
+                  className="flex items-center gap-1.5 text-sm cursor-pointer font-medium text-[var(--color-text-secondary)] hover:text-red-500 px-3 py-2 rounded-xl hover:bg-red-50 transition-all"
                 >
                   <LogOut className="w-4 h-4" /> Logout
                 </button>
@@ -125,7 +141,7 @@ export default function Navbar() {
             ) : (
               <button
                 onClick={() => setShowLogin(true)}
-                className="hidden md:flex items-center gap-2 bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all shadow-md shadow-blue-200 hover:shadow-blue-300"
+                className="hidden md:flex items-center gap-2 cursor-pointer bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all shadow-md shadow-blue-200 hover:shadow-blue-300"
               >
                 <LogIn className="w-4 h-4" />
                 Login / Register
@@ -180,7 +196,7 @@ export default function Navbar() {
             </button>
             <button
               onClick={() => (user ? logout() : setShowLogin(true))}
-              className="ml-auto flex items-center gap-2 bg-[var(--color-primary)] text-white text-sm font-semibold px-5 py-2.5 rounded-xl"
+              className="ml-auto flex items-center gap-2 cursor-pointer bg-[var(--color-primary)] text-white text-sm font-semibold px-5 py-2.5 rounded-xl"
             >
               <LogIn className="w-4 h-4" />
               {user ? "Logout" : "Login"}
