@@ -39,7 +39,7 @@
 
   /* 📐 Layout */
   --width-container: 1400px;
-  --padding-container: 1rem;
+  --padding-container: 0.5rem;
 }
 
 /* 🌍 Global Styles */
@@ -47,6 +47,7 @@ body {
   background-color: var(--color-bg-main);
   color: var(--color-text-primary);
   font-family: "Poppins", sans-serif;
+  
 }
 /* Hide scrollbar (Chrome, Safari, Edge) */
 .hide-scrollbar::-webkit-scrollbar {

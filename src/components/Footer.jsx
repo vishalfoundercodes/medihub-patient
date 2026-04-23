@@ -154,7 +154,7 @@ export default function Footer() {
         </Container>
       </div>
       <div
-        className="bg-primary px-[4rem] py-2 flex items-center rounded-b-xl"
+        className="bg-primary px-[1rem] md:px-[4rem] py-2 flex items-center rounded-b-xl"
      
       >
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 w-full">

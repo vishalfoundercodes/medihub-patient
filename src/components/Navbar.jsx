@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import { MapPin, Bell, ChevronDown, Menu, X, LogIn } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { MapPin, Bell, ChevronDown, Menu, X, LogIn, User, LogOut } from 'lucide-react';
 import medihubLogo from "../assets/medihubLogo.png";
 import Container from './Container';
+import { useAuth } from '../context/AuthContext';
 
 const navLinks = [
   { label: 'Home', to: '/' },
@@ -14,6 +15,8 @@ const navLinks = [
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user, logout, setShowLogin } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <nav className="bg-white sticky top-0 z-50 shadow-sm">
@@ -86,16 +89,42 @@ export default function Navbar() {
             </button>
 
             {/* Bell */}
-            <button className="relative w-9 h-9 flex items-center justify-center rounded-xl border border-[var(--color-border)] hover:border-[var(--color-primary)] hover:bg-blue-50 transition-all">
+            <button
+              onClick={() => navigate('/notifications')}
+              className="relative w-9 h-9 flex items-center justify-center rounded-xl border border-[var(--color-border)] hover:border-[var(--color-primary)] hover:bg-blue-50 transition-all">
               <Bell className="w-4.5 h-4.5 text-[var(--color-text-secondary)]" />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
             </button>
 
-            {/* Login button */}
-            <button className="hidden md:flex items-center gap-2 bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all shadow-md shadow-blue-200 hover:shadow-blue-300">
-              <LogIn className="w-4 h-4" />
-              Login / Register
-            </button>
+            {/* Login / User button */}
+            {user ? (
+              <div className="hidden md:flex items-center gap-2">
+                <button
+                  onClick={() => navigate('/account')}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 border border-blue-100 hover:border-[var(--color-primary)] transition-all"
+                >
+                  <div className="w-7 h-7 bg-[var(--color-primary)] rounded-full flex items-center justify-center">
+                    <User className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="text-sm font-semibold text-[var(--color-text-dark)]">Hi, {user.name.split(' ')[0]}</span>
+                  <ChevronDown className="w-3 h-3 text-[var(--color-text-secondary)]" />
+                </button>
+                <button
+                  onClick={logout}
+                  className="flex items-center gap-1.5 text-sm font-medium text-[var(--color-text-secondary)] hover:text-red-500 px-3 py-2 rounded-xl hover:bg-red-50 transition-all"
+                >
+                  <LogOut className="w-4 h-4" /> Logout
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowLogin(true)}
+                className="hidden md:flex items-center gap-2 bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all shadow-md shadow-blue-200 hover:shadow-blue-300"
+              >
+                <LogIn className="w-4 h-4" />
+                Login / Register
+              </button>
+            )}
 
             {/* Mobile hamburger */}
             <button
@@ -142,9 +171,12 @@ export default function Navbar() {
               <MapPin className="w-4 h-4 text-[var(--color-primary)]" />
               New Delhi, 110001
             </button>
-            <button className="ml-auto flex items-center gap-2 bg-[var(--color-primary)] text-white text-sm font-semibold px-5 py-2.5 rounded-xl">
+            <button
+              onClick={() => user ? logout() : setShowLogin(true)}
+              className="ml-auto flex items-center gap-2 bg-[var(--color-primary)] text-white text-sm font-semibold px-5 py-2.5 rounded-xl"
+            >
               <LogIn className="w-4 h-4" />
-              Login
+              {user ? 'Logout' : 'Login'}
             </button>
           </div>
         </div>
