@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { ChevronUp, ChevronDown, Plus } from 'lucide-react';
-import { filterSpecializations, experienceOptions } from '../../data/doctorsData';
+import { ChevronUp, ChevronDown } from 'lucide-react';
+
+const experienceOptions = ['0-5', '5-10', '10-20', '20+'];
+const EXPERIENCE_LABELS = { '0-5': '0-5 Years', '5-10': '5-10 Years', '10-20': '10-20 Years', '20+': '20+ Years' };
 
 function FilterSection({ title, children, defaultOpen = true }) {
   const [open, setOpen] = useState(defaultOpen);
@@ -8,41 +10,33 @@ function FilterSection({ title, children, defaultOpen = true }) {
     <div className="border-b border-[var(--color-border)] pb-4 mb-4">
       <button onClick={() => setOpen(!open)} className="flex items-center justify-between w-full mb-3">
         <span className="font-semibold text-sm text-[var(--color-text-dark)]">{title}</span>
-        {open
-          ? <ChevronUp className="w-4 h-4 text-[var(--color-text-secondary)]" />
-          : <ChevronDown className="w-4 h-4 text-[var(--color-text-secondary)]" />
-        }
+        {open ? <ChevronUp className="w-4 h-4 text-[var(--color-text-secondary)]" /> : <ChevronDown className="w-4 h-4 text-[var(--color-text-secondary)]" />}
       </button>
       {open && children}
     </div>
   );
 }
 
-export default function DoctorFilters({ filters, onChange, onClear }) {
-  const [showAllSpecs, setShowAllSpecs] = useState(false);
-  const visibleSpecs = showAllSpecs ? filterSpecializations : filterSpecializations.slice(0, 6);
-
+export default function DoctorFilters({ filters, onChange, onClear, specializations = [] }) {
   return (
     <div className="bg-white rounded-2xl border border-[var(--color-border)] p-5 sticky top-[120px]">
       <div className="flex items-center justify-between mb-5">
         <h3 className="font-bold text-[var(--color-text-dark)]">Filters</h3>
-        <button onClick={onClear} className="text-xs font-semibold text-[var(--color-primary)] hover:underline">
-          Clear All
-        </button>
+        <button onClick={onClear} className="text-xs font-semibold text-[var(--color-primary)] hover:underline">Clear All</button>
       </div>
 
       {/* Consultation Type */}
       <FilterSection title="Consultation Type">
         <div className="flex flex-col gap-2">
-          {['All', 'In-clinic', 'Video Consultation'].map((type) => (
-            <label key={type} className="flex items-center gap-2.5 cursor-pointer group">
+          {[{ label: 'All', value: 'all' }, { label: 'In-Clinic', value: 'clinic' }, { label: 'Online', value: 'online' }].map(({ label, value }) => (
+            <label key={value} className="flex items-center gap-2.5 cursor-pointer group">
               <input
                 type="checkbox"
-                checked={filters.consultationTypes.includes(type)}
-                onChange={() => onChange('consultationType', type)}
+                checked={filters.consultancyType === value}
+                onChange={() => onChange('consultancyType', filters.consultancyType === value ? 'all' : value)}
                 className="w-4 h-4 accent-[var(--color-primary)] rounded"
               />
-              <span className="text-sm text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-dark)]">{type}</span>
+              <span className="text-sm text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-dark)]">{label}</span>
             </label>
           ))}
         </div>
@@ -50,26 +44,18 @@ export default function DoctorFilters({ filters, onChange, onClear }) {
 
       {/* Specialization */}
       <FilterSection title="Specialization">
-        <div className="flex flex-col gap-2">
-          {visibleSpecs.map((spec) => (
+        <div className="flex flex-col gap-2 max-h-40 overflow-y-auto pr-1">
+          {specializations.map((spec) => (
             <label key={spec} className="flex items-center gap-2.5 cursor-pointer group">
               <input
                 type="checkbox"
-                checked={filters.specializations.includes(spec)}
-                onChange={() => onChange('specialization', spec)}
+                checked={filters.specialization === spec}
+                onChange={() => onChange('specialization', filters.specialization === spec ? '' : spec)}
                 className="w-4 h-4 accent-[var(--color-primary)] rounded"
               />
               <span className="text-sm text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-dark)]">{spec}</span>
             </label>
           ))}
-          {!showAllSpecs && (
-            <button
-              onClick={() => setShowAllSpecs(true)}
-              className="flex items-center gap-1 text-xs font-semibold text-[var(--color-primary)] mt-1 hover:underline"
-            >
-              <Plus className="w-3 h-3" /> View More
-            </button>
-          )}
         </div>
       </FilterSection>
 
@@ -80,11 +66,11 @@ export default function DoctorFilters({ filters, onChange, onClear }) {
             <label key={exp} className="flex items-center gap-2.5 cursor-pointer group">
               <input
                 type="checkbox"
-                checked={filters.experience.includes(exp)}
-                onChange={() => onChange('experience', exp)}
+                checked={filters.experience === exp}
+                onChange={() => onChange('experience', filters.experience === exp ? '' : exp)}
                 className="w-4 h-4 accent-[var(--color-primary)] rounded"
               />
-              <span className="text-sm text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-dark)]">{exp}</span>
+              <span className="text-sm text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-dark)]">{EXPERIENCE_LABELS[exp]}</span>
             </label>
           ))}
         </div>
@@ -93,9 +79,7 @@ export default function DoctorFilters({ filters, onChange, onClear }) {
       {/* Fees Range */}
       <FilterSection title="Fees Range">
         <input
-          type="range"
-          min={0}
-          max={2000}
+          type="range" min={0} max={2000}
           value={filters.maxFee}
           onChange={(e) => onChange('maxFee', Number(e.target.value))}
           className="w-full accent-[var(--color-primary)]"
@@ -107,7 +91,7 @@ export default function DoctorFilters({ filters, onChange, onClear }) {
       </FilterSection>
 
       {/* Availability */}
-      <FilterSection title="Availability" defaultOpen={true}>
+      <FilterSection title="Availability">
         <label className="flex items-center gap-2.5 cursor-pointer group">
           <input
             type="checkbox"
@@ -120,11 +104,11 @@ export default function DoctorFilters({ filters, onChange, onClear }) {
       </FilterSection>
 
       {/* Sort By */}
-      <FilterSection title="Sort By" defaultOpen={true}>
+      <FilterSection title="Sort By">
         <select
           value={filters.sortBy}
           onChange={(e) => onChange('sortBy', e.target.value)}
-          className="w-full border border-[var(--color-border)] rounded-xl px-3 py-2.5 text-sm text-[var(--color-text-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-white"
+          className="w-full border border-[var(--color-border)] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-white"
         >
           <option>Popularity</option>
           <option>Fee: Low to High</option>

@@ -1,17 +1,13 @@
 import { useState } from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 
-const categoryOptions = ['All Category', 'Blood Test', 'Diabetes', 'Thyroid', 'Heart', 'Liver', 'Kidney', 'Vitamins'];
 const discountOptions = ['10% and above', '20% and above', '30% and above'];
 
 function FilterSection({ title, children, defaultOpen = true }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
     <div className="border-b border-[var(--color-border)] pb-4 mb-4">
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center justify-between w-full mb-3"
-      >
+      <button onClick={() => setOpen(!open)} className="flex items-center justify-between w-full mb-3">
         <span className="font-semibold text-sm text-[var(--color-text-dark)]">{title}</span>
         {open ? <ChevronUp className="w-4 h-4 text-[var(--color-text-secondary)]" /> : <ChevronDown className="w-4 h-4 text-[var(--color-text-secondary)]" />}
       </button>
@@ -20,31 +16,35 @@ function FilterSection({ title, children, defaultOpen = true }) {
   );
 }
 
-export default function LabFilters({ filters, onChange, onClear }) {
+export default function LabFilters({ filters, onChange, onClear, categories = [] }) {
   return (
     <div className="bg-white rounded-2xl border border-[var(--color-border)] p-5 sticky top-[120px]">
       <div className="flex items-center justify-between mb-5">
         <h3 className="font-bold text-[var(--color-text-dark)]">Filters</h3>
-        <button
-          onClick={onClear}
-          className="text-xs font-semibold text-[var(--color-primary)] hover:underline"
-        >
-          Clear All
-        </button>
+        <button onClick={onClear} className="text-xs font-semibold text-[var(--color-primary)] hover:underline">Clear All</button>
       </div>
 
       {/* Category */}
       <FilterSection title="Category">
         <div className="flex flex-col gap-2">
-          {categoryOptions.map((cat) => (
-            <label key={cat} className="flex items-center gap-2.5 cursor-pointer group">
+          <label className="flex items-center gap-2.5 cursor-pointer group">
+            <input
+              type="checkbox"
+              checked={filters.categoryId === null}
+              onChange={() => onChange('categoryId', null)}
+              className="w-4 h-4 accent-[var(--color-primary)] rounded"
+            />
+            <span className="text-sm text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-dark)]">All Category</span>
+          </label>
+          {categories.map((cat) => (
+            <label key={cat.id} className="flex items-center gap-2.5 cursor-pointer group">
               <input
                 type="checkbox"
-                checked={filters.categories.includes(cat)}
-                onChange={() => onChange('category', cat)}
+                checked={filters.categoryId === cat.id}
+                onChange={() => onChange('categoryId', filters.categoryId === cat.id ? null : cat.id)}
                 className="w-4 h-4 accent-[var(--color-primary)] rounded"
               />
-              <span className="text-sm text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-dark)]">{cat}</span>
+              <span className="text-sm text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-dark)]">{cat.name}</span>
             </label>
           ))}
         </div>
@@ -53,9 +53,7 @@ export default function LabFilters({ filters, onChange, onClear }) {
       {/* Price Range */}
       <FilterSection title="Price Range">
         <input
-          type="range"
-          min={0}
-          max={5000}
+          type="range" min={0} max={5000}
           value={filters.maxPrice}
           onChange={(e) => onChange('maxPrice', Number(e.target.value))}
           className="w-full accent-[var(--color-primary)]"
@@ -97,11 +95,11 @@ export default function LabFilters({ filters, onChange, onClear }) {
       </FilterSection>
 
       {/* Sort By */}
-      <FilterSection title="Sort By" defaultOpen={true}>
+      <FilterSection title="Sort By">
         <select
           value={filters.sortBy}
           onChange={(e) => onChange('sortBy', e.target.value)}
-          className="w-full border border-[var(--color-border)] rounded-xl px-3 py-2.5 text-sm text-[var(--color-text-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-white"
+          className="w-full border border-[var(--color-border)] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-white"
         >
           <option>Popularity</option>
           <option>Price: Low to High</option>

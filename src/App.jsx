@@ -19,9 +19,12 @@ import HelpSupport from './pages/HelpSupport';
 import LabCheckout from './pages/LabCheckout';
 import BookAppointment from './pages/BookAppointment';
 import MedicineCart from './pages/MedicineCart';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsConditions from './pages/TermsConditions';
+import CancellationPolicy from './pages/CancellationPolicy';
+import Search from './pages/Search';
 import MyAddresses from './pages/MyAddresses';
 import OrderDetail from './pages/OrderDetail';
-import Search from './pages/Search';
 import LoginModal from './components/LoginModal';
 import './index.css';
 
@@ -47,6 +50,10 @@ function AppContent() {
         <Route path="/lab-checkout" element={<LabCheckout />} />
         <Route path="/book-appointment/:id" element={<BookAppointment />} />
         <Route path="/medicine-cart" element={<MedicineCart />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsConditions />} />
+        <Route path="/cancellation" element={<CancellationPolicy />} />
+        <Route path="/search" element={<Search />} />
         <Route path="/my-addresses" element={<MyAddresses />} />
         <Route path="/order/:id" element={<OrderDetail />} />
         <Route path="/search" element={<Search />} />

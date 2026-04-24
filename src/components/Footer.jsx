@@ -1,7 +1,9 @@
-import { Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Facebook, Twitter, Instagram, Linkedin, Youtube } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import medihubLogo from "../assets/medihubLogo.png";
 import Container from './Container';
+import api, { apis } from '../utlities/api';
 
 const QUICK_LINKS = [
   { label: 'Home',      to: '/'          },
@@ -22,11 +24,31 @@ const CUSTOMER_CARE_LINKS = [
 ];
 
 const POLICY_LINKS = [
-  { label: 'Privacy Policy',    to: '/help-support' },
-  { label: 'Terms & Conditions',to: '/help-support' },
+  { label: 'Privacy Policy',      to: '/privacy'      },
+  { label: 'Terms & Conditions',  to: '/terms'        },
+  { label: 'Cancellation Policy', to: '/cancellation' },
 ];
 
 export default function Footer() {
+  const [settings, setSettings] = useState({});
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await api.get(apis.appSettings);
+        if (res.data.success) setSettings(res.data.data.settings);
+      } catch {}
+    };
+    fetchSettings();
+  }, []);
+
+  const SOCIAL_LINKS = [
+    { key: 'facebook',  Icon: Facebook,  label: 'Facebook'  },
+    { key: 'twitter',   Icon: Twitter,   label: 'Twitter'   },
+    { key: 'instagram', Icon: Instagram, label: 'Instagram' },
+    { key: 'linkedin',  Icon: Linkedin,  label: 'LinkedIn'  },
+    { key: 'youtube',   Icon: Youtube,   label: 'YouTube'   },
+  ].filter(({ key }) => settings[key]);
   return (
     <footer className="bg-white border-t border-[var(--color-border)]">
       <div className="max-w-full mx-auto  pt-12">
@@ -44,10 +66,13 @@ export default function Footer() {
               Your trusted partner for healthcare needs.
             </p>
             <div className="flex gap-3">
-              {[Facebook, Twitter, Instagram, Linkedin].map((Icon, i) => (
+              {SOCIAL_LINKS.map(({ key, Icon, label }) => (
                 <a
-                  key={i}
-                  href="#"
+                  key={key}
+                  href={settings[key]}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={label}
                   className="text-[var(--color-primary)] hover:text-[var(--color-secondary)]"
                 >
                   <Icon className="w-5 h-5" />
@@ -108,7 +133,8 @@ export default function Footer() {
             </p>
             <div className="flex gap-2">
               <a
-                href="#"
+                href={settings.playstore || '#'}
+                target="_blank" rel="noreferrer"
                 className="bg-black text-white whitespace-nowrap text-xs px-2 py-2 rounded-lg flex items-center gap-2 hover:bg-gray-800"
               >
                 <svg
@@ -121,7 +147,8 @@ export default function Footer() {
                 Google Play
               </a>
               <a
-                href="#"
+                href={settings.appstore || '#'}
+                target="_blank" rel="noreferrer"
                 className="bg-black text-white whitespace-nowrap text-xs px-2 py-2 rounded-lg flex items-center gap-2 hover:bg-gray-800"
               >
                 <svg

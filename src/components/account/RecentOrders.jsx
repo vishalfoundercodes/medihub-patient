@@ -13,7 +13,7 @@ export default function RecentOrders() {
   const navigate=useNavigate()
   return (
     <div className="bg-white rounded-2xl border border-[var(--color-border)] p-4">
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center justify-between mb-3">
         <h3 className="font-bold text-[var(--color-text-dark)]">Recent Orders</h3>
         <button className="text-sm font-semibold text-[var(--color-primary)] cursor-pointer hover:underline"
         onClick={()=>navigate("/orders")}
@@ -22,7 +22,7 @@ export default function RecentOrders() {
 
       <div className="space-y-3">
         {MOCK_ORDERS.map((order) => (
-          <div key={order.id} className="flex items-center gap-4 p-3 rounded-xl hover:bg-[var(--color-bg-section)] transition-colors">
+          <div key={order.id} className="flex items-center gap-4 p-0 rounded-xl hover:bg-[var(--color-bg-section)] transition-colors">
             {/* Icon */}
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${order.type === 'Medicines' ? 'bg-blue-100' : 'bg-teal-100'}`}>
               {order.type === 'Medicines'

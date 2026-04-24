@@ -11,7 +11,7 @@ import { useAuth } from '../context/AuthContext';
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, logout, setShowLogin } = useAuth();
-  const { items: wishlistItems } = useWishlist();
+  const { items: wishlistItems =[] } = useWishlist();
   const navigate = useNavigate();
 
   const navLinks = [

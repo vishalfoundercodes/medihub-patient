@@ -93,7 +93,7 @@ export default function BookAppointment() {
 
   const validate = () => {
     const e = {};
-    if (!form.patientName.trim()) e.patientName = 'Patient name is required';
+    // if (!form.patientName.trim()) e.patientName = 'Patient name is required';
     if (!form.age || isNaN(form.age) || form.age < 1) e.age = 'Valid age is required';
     if (!form.gender) e.gender = 'Gender is required';
     if (!selectedDate) e.date = 'Please select a date';
@@ -147,7 +147,10 @@ export default function BookAppointment() {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-[var(--color-text-secondary)]">Patient</span>
-                <span className="font-semibold text-[var(--color-text-dark)]">{form.patientName}, {form.age} yrs</span>
+                <span className="font-semibold text-[var(--color-text-dark)]">
+                  {/* {form.patientName},  */}
+                  {form.age} yrs</span>
+
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-[var(--color-text-secondary)]">Date & Time</span>
@@ -379,7 +382,7 @@ export default function BookAppointment() {
               </h3>
               <div className="grid sm:grid-cols-2 gap-4">
                 {/* Name */}
-                <div className="sm:col-span-2">
+                {/* <div className="sm:col-span-2">
                   <label className="text-sm font-semibold text-[var(--color-text-dark)] mb-2 block">
                     Patient Name *
                   </label>
@@ -395,7 +398,7 @@ export default function BookAppointment() {
                       {errors.patientName}
                     </p>
                   )}
-                </div>
+                </div> */}
 
                 {/* Age */}
                 <div>
@@ -609,7 +612,7 @@ export default function BookAppointment() {
                       Patient:
                     </span>
                     <span className="font-semibold text-[var(--color-text-dark)]">
-                      {form.patientName}
+                      {/* {form.patientName} */}
                       {form.age ? `, ${form.age} yrs` : ""}
                     </span>
                   </div>

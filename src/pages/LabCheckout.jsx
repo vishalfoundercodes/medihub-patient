@@ -78,7 +78,7 @@ export default function LabCheckout() {
 
   const validate = () => {
     const e = {};
-    if (!form.patientName.trim()) e.patientName = 'Patient name is required';
+    // if (!form.patientName.trim()) e.patientName = 'Patient name is required';
     if (!form.age || isNaN(form.age) || form.age < 1) e.age = 'Valid age is required';
     if (!form.gender) e.gender = 'Gender is required';
     if (!form.date) e.date = 'Please select a date';
@@ -136,7 +136,9 @@ export default function LabCheckout() {
               <p className="text-xs font-semibold text-[var(--color-text-secondary)] mb-2">BOOKING DETAILS</p>
               <div className="flex justify-between text-sm">
                 <span className="text-[var(--color-text-secondary)]">Patient</span>
-                <span className="font-semibold text-[var(--color-text-dark)]">{form.patientName}, {form.age} yrs ({form.gender})</span>
+                <span className="font-semibold text-[var(--color-text-dark)]">
+                  {/* {form.patientName}, */}
+                   {form.age} yrs ({form.gender})</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-[var(--color-text-secondary)]">Tests</span>
@@ -218,7 +220,7 @@ export default function LabCheckout() {
               <div className="grid sm:grid-cols-2 gap-4">
 
                 {/* Name */}
-                <div className="sm:col-span-2">
+                {/* <div className="sm:col-span-2">
                   <label className="text-sm font-semibold text-[var(--color-text-dark)] mb-2 block">Patient Name *</label>
                   <input
                     type="text"
@@ -228,7 +230,7 @@ export default function LabCheckout() {
                     className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] ${errors.patientName ? 'border-red-400' : 'border-[var(--color-border)]'}`}
                   />
                   {errors.patientName && <p className="text-red-500 text-xs mt-1">{errors.patientName}</p>}
-                </div>
+                </div> */}
 
                 {/* Age */}
                 <div>
@@ -404,7 +406,7 @@ export default function LabCheckout() {
                 <div className="bg-[var(--color-bg-section)] rounded-xl p-3 mb-4 space-y-1.5">
                   {form.patientName && (
                     <p className="text-xs text-[var(--color-text-secondary)]">
-                      👤 <span className="font-semibold text-[var(--color-text-dark)]">{form.patientName}</span>
+                      {/* 👤 <span className="font-semibold text-[var(--color-text-dark)]">{form.patientName}</span> */}
                       {form.age && `, ${form.age} yrs`}
                       {form.gender && ` (${form.gender})`}
                     </p>
