@@ -1,19 +1,22 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Star, Video, Building2, User, Calendar,
   CheckCircle, Loader2, ShieldCheck, FileText,
-  Clock, Stethoscope, Upload, X, FileImage, File
+  Clock, Stethoscope, Upload, X
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Container from '../components/Container';
-import { doctors } from '../data/doctorsData';
+import api, { apis } from '../utlities/api';
 
-const TIME_SLOTS = {
-  morning:   ['7:00 AM - 8:00 AM', '8:00 AM - 9:00 AM', '9:00 AM - 10:00 AM', '10:00 AM - 11:00 AM'],
-  afternoon: ['12:00 PM - 1:00 PM', '1:00 PM - 2:00 PM', '2:00 PM - 3:00 PM', '3:00 PM - 4:00 PM'],
-  evening:   ['5:00 PM - 6:00 PM', '6:00 PM - 7:00 PM', '7:00 PM - 8:00 PM'],
+const WEEKDAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+
+const formatTime = (t) => {
+  const [h, m] = t.split(':').map(Number);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const hour = h % 12 || 12;
+  return `${hour}:${m.toString().padStart(2, '0')} ${ampm}`;
 };
 
 const getAvailableDates = () => {
@@ -54,17 +57,51 @@ const CONSULTATION_TYPES = [
 export default function BookAppointment() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const doctor = doctors.find((d) => d.id === Number(id));
 
+  const [doctor, setDoctor] = useState(null);
+  const [doctorLoading, setDoctorLoading] = useState(true);
   const [consultationType, setConsultationType] = useState('clinic');
   const [form, setForm] = useState({ patientName: '', age: '', gender: '', reason: '' });
   const [selectedDate, setSelectedDate] = useState('');
-  const [selectedTime, setSelectedTime] = useState('');
+  const [selectedSlot, setSelectedSlot] = useState(null); // { id, label }
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [reports, setReports] = useState([]);
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    const fetchDoctor = async () => {
+      try {
+        const res = await api.get(`${apis.getDoctorDetail}/${id}`);
+        if (res.data.success) {
+          const doc = res.data.data.doctor;
+          setDoctor(doc);
+          // Auto-set consultation type based on doctor's consultancy_type
+          if (doc.consultancy_type === 'online') setConsultationType('video');
+          else setConsultationType('clinic');
+        }
+      } catch (err) {
+        console.error('Failed to fetch doctor:', err);
+      } finally {
+        setDoctorLoading(false);
+      }
+    };
+    fetchDoctor();
+  }, [id]);
+
+  const availableDays = doctor?.slots ? Object.keys(doctor.slots) : [];
+
+  const isDateAvailable = (dateStr) => {
+    const day = WEEKDAYS[new Date(dateStr).getDay()];
+    return availableDays.includes(day);
+  };
+
+  const getSlotsForDate = (dateStr) => {
+    if (!doctor?.slots || !dateStr) return [];
+    const day = WEEKDAYS[new Date(dateStr).getDay()];
+    return doctor.slots[day] || [];
+  };
 
   const handleFileUpload = (e) => {
     const files = Array.from(e.target.files);
@@ -93,20 +130,53 @@ export default function BookAppointment() {
 
   const validate = () => {
     const e = {};
-    // if (!form.patientName.trim()) e.patientName = 'Patient name is required';
-    if (!form.age || isNaN(form.age) || form.age < 1) e.age = 'Valid age is required';
-    if (!form.gender) e.gender = 'Gender is required';
+    // if (!form.age || isNaN(form.age) || form.age < 1) e.age = 'Valid age is required';
+    // if (!form.gender) e.gender = 'Gender is required';
     if (!selectedDate) e.date = 'Please select a date';
-    if (!selectedTime) e.time = 'Please select a time slot';
+    if (!selectedSlot) e.time = 'Please select a time slot';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validate()) return;
     setLoading(true);
-    setTimeout(() => { setLoading(false); setSuccess(true); }, 1500);
+    try {
+      const formData = new FormData();
+      formData.append('doctor_id', doctor.id);
+      formData.append('slot_id', selectedSlot.id);
+      formData.append('appointment_date', selectedDate);
+      formData.append('consultancy_type', consultationType === 'video' ? 'online' : 'offline');
+      reports.forEach((r) => formData.append('reports', r.file));
+
+      const res = await api.post(apis.bookAppointment, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      if (res.data.success) {
+        setSuccess(true);
+      } else {
+        setErrors((p) => ({ ...p, submit: res.data.message || 'Failed to book appointment.' }));
+      }
+    } catch (err) {
+      console.error('[BookAppointment] Error:', err?.response?.data || err.message);
+      setErrors((p) => ({ ...p, submit: err?.response?.data?.message || 'Network error. Please try again.' }));
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (doctorLoading) {
+    return (
+      <div className="min-h-screen bg-[var(--color-bg-main)]">
+        <Navbar />
+        <Container className="py-20 text-center">
+          <Loader2 className="w-10 h-10 animate-spin text-[var(--color-primary)] mx-auto" />
+        </Container>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!doctor) {
     return (
@@ -145,16 +215,13 @@ export default function BookAppointment() {
                 <span className="text-[var(--color-text-secondary)]">Doctor</span>
                 <span className="font-semibold text-[var(--color-text-dark)]">{doctor.name}</span>
               </div>
-              <div className="flex justify-between text-sm">
+              {/* <div className="flex justify-between text-sm">
                 <span className="text-[var(--color-text-secondary)]">Patient</span>
-                <span className="font-semibold text-[var(--color-text-dark)]">
-                  {/* {form.patientName},  */}
-                  {form.age} yrs</span>
-
-              </div>
+                <span className="font-semibold text-[var(--color-text-dark)]">{form.age} yrs</span>
+              </div> */}
               <div className="flex justify-between text-sm">
                 <span className="text-[var(--color-text-secondary)]">Date & Time</span>
-                <span className="font-semibold text-[var(--color-text-dark)]">{selectedDate} • {selectedTime}</span>
+                <span className="font-semibold text-[var(--color-text-dark)]">{selectedDate} • {selectedSlot?.label}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-[var(--color-text-secondary)]">Type</span>
@@ -162,7 +229,7 @@ export default function BookAppointment() {
               </div>
               <div className="flex justify-between text-sm border-t border-[var(--color-border)] pt-2 mt-2">
                 <span className="font-bold text-[var(--color-text-dark)]">Consultation Fee</span>
-                <span className="font-bold text-[var(--color-primary)]">₹{doctor.fee}</span>
+                <span className="font-bold text-[var(--color-primary)]">₹{doctor.consultation_fee}</span>
               </div>
             </div>
 
@@ -208,43 +275,23 @@ export default function BookAppointment() {
             <div className="bg-white rounded-2xl border border-[var(--color-border)] p-5">
               <div className="flex items-center gap-4 flex-wrap sm:flex-nowrap">
                 <div className="w-20 h-20 rounded-2xl overflow-hidden bg-[var(--color-bg-section)] shrink-0 border border-[var(--color-border)]">
-                  <img
-                    src={doctor.image}
-                    alt={doctor.name}
-                    className="w-full h-full object-cover object-top"
-                  />
+                  <img src={doctor.profile_img} alt={doctor.name} className="w-full h-full object-cover object-top" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h2 className="font-bold text-lg text-[var(--color-text-dark)] mb-0.5">
-                    {doctor.name}
-                  </h2>
+                  <h2 className="font-bold text-lg text-[var(--color-text-dark)] mb-0.5">{doctor.name}</h2>
                   <p className="text-sm text-[var(--color-text-secondary)] mb-2">
-                    {doctor.specialty} • {doctor.experience} Yrs Experience
+                    {doctor.specialization} • {doctor.experience_years} Yrs Experience
                   </p>
                   <div className="flex items-center gap-3 flex-wrap">
                     <div className="flex items-center gap-1">
                       <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      <span className="text-sm font-bold text-[var(--color-text-dark)]">
-                        {doctor.rating}
-                      </span>
-                      <span className="text-xs text-[var(--color-text-secondary)]">
-                        ({doctor.reviews}+ reviews)
-                      </span>
+                      <span className="text-sm font-bold text-[var(--color-text-dark)]">{doctor.rating}</span>
+                      <span className="text-xs text-[var(--color-text-secondary)]">({doctor.total_reviews}+ reviews)</span>
                     </div>
-                    {doctor.availableToday && (
-                      <span className="flex items-center gap-1 text-xs font-semibold text-[var(--color-success)] bg-green-50 border border-green-100 px-2.5 py-1 rounded-full">
-                        <span className="w-1.5 h-1.5 bg-[var(--color-success)] rounded-full" />{" "}
-                        Available Today
-                      </span>
-                    )}
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-2xl font-bold text-[var(--color-text-dark)]">
-                      ₹{doctor.fee}
-                    </p>
-                    <p className="text-xs text-[var(--color-text-secondary)]">
-                      Consultation Fee
-                    </p>
+                    <p className="text-2xl font-bold text-[var(--color-text-dark)]">₹{doctor.consultation_fee}</p>
+                    <p className="text-xs text-[var(--color-text-secondary)]">Consultation Fee</p>
                   </div>
                 </div>
               </div>
@@ -257,42 +304,37 @@ export default function BookAppointment() {
                 Consultation Type
               </h3>
               <div className="grid sm:grid-cols-2 gap-4">
-                {CONSULTATION_TYPES.map(
-                  ({ id, label, icon: Icon, desc, color, bg }) => (
+                {CONSULTATION_TYPES.map(({ id, label, icon: Icon, desc, color, bg }) => {
+                  const isBoth = doctor.consultancy_type === 'both';
+                  const isActive = consultationType === id;
+                  const isLocked = !isBoth;
+                  const isVisible = isBoth || (doctor.consultancy_type === 'online' && id === 'video') || (doctor.consultancy_type === 'offline' && id === 'clinic');
+                  if (!isVisible) return null;
+                  return (
                     <div
                       key={id}
-                      onClick={() => setConsultationType(id)}
-                      className={`flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all
-                      ${
-                        consultationType === id
-                          ? "border-[var(--color-primary)] bg-blue-50"
-                          : "border-[var(--color-border)] hover:border-blue-200"
-                      }`}
+                      onClick={() => isBoth && setConsultationType(id)}
+                      className={`flex items-start gap-4 p-4 rounded-xl border-2 transition-all
+                        ${isActive ? 'border-[var(--color-primary)] bg-blue-50' : 'border-[var(--color-border)]'}
+                        ${isBoth ? 'cursor-pointer hover:border-blue-200' : 'cursor-default'}`}
                     >
-                      <div
-                        className={`${bg} w-11 h-11 rounded-xl flex items-center justify-center shrink-0`}
-                      >
+                      <div className={`${bg} w-11 h-11 rounded-xl flex items-center justify-center shrink-0`}>
                         <Icon className={`w-5 h-5 ${color}`} />
                       </div>
                       <div className="flex-1">
-                        <p className="font-bold text-sm text-[var(--color-text-dark)] mb-0.5">
-                          {label}
-                        </p>
-                        <p className="text-xs text-[var(--color-text-secondary)]">
-                          {desc}
-                        </p>
-                      </div>
-                      <div
-                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5
-                      ${consultationType === id ? "border-[var(--color-primary)] bg-[var(--color-primary)]" : "border-[var(--color-border)]"}`}
-                      >
-                        {consultationType === id && (
-                          <div className="w-2 h-2 bg-white rounded-full" />
+                        <p className="font-bold text-sm text-[var(--color-text-dark)] mb-0.5">{label}</p>
+                        <p className="text-xs text-[var(--color-text-secondary)]">{desc}</p>
+                        {isLocked && (
+                          <span className="text-[10px] font-semibold text-[var(--color-primary)] bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full mt-1 inline-block">Only Available</span>
                         )}
                       </div>
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5
+                        ${isActive ? 'border-[var(--color-primary)] bg-[var(--color-primary)]' : 'border-[var(--color-border)]'}`}>
+                        {isActive && <div className="w-2 h-2 bg-white rounded-full" />}
+                      </div>
                     </div>
-                  ),
-                )}
+                  );
+                })}
               </div>
             </div>
 
@@ -303,34 +345,37 @@ export default function BookAppointment() {
                 Select Date
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-2 overflow-x-auto scrollbar-hide pb-1">
-                {dates.map((d) => (
-                  <button
-                    key={d.value}
-                    onClick={() => {
-                      setSelectedDate(d.value);
-                      setErrors((p) => ({ ...p, date: "" }));
-                    }}
-                    className={`flex flex-col cursor-pointer items-center px-4 py-3 rounded-xl border transition-all shrink-0 min-w-[64px]
-                      ${
-                        selectedDate === d.value
-                          ? "bg-[var(--color-primary)] text-white border-[var(--color-primary)] shadow-md shadow-blue-100"
-                          : "bg-white text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
-                      }`}
-                  >
-                    <span className="text-xs font-medium">{d.day}</span>
-                    <span className="text-lg font-bold leading-tight">
-                      {d.date}
-                    </span>
-                    <span className="text-xs">{d.month}</span>
-                    {d.label && (
-                      <span
-                        className={`text-[10px] font-bold mt-0.5 ${selectedDate === d.value ? "text-blue-100" : "text-[var(--color-primary)]"}`}
-                      >
-                        {d.label}
-                      </span>
-                    )}
-                  </button>
-                ))}
+                {dates.map((d) => {
+                  const available = isDateAvailable(d.value);
+                  return (
+                    <button
+                      key={d.value}
+                      disabled={!available}
+                      onClick={() => {
+                        setSelectedDate(d.value);
+                        setSelectedSlot(null);
+                        setErrors((p) => ({ ...p, date: '', time: '' }));
+                      }}
+                      className={`flex flex-col items-center px-4 py-3 rounded-xl border transition-all shrink-0 min-w-[64px]
+                        ${
+                          !available
+                            ? 'opacity-40 cursor-not-allowed bg-gray-50 border-[var(--color-border)] text-[var(--color-text-secondary)]'
+                            : selectedDate === d.value
+                            ? 'bg-[var(--color-primary)] text-white border-[var(--color-primary)] shadow-md shadow-blue-100 cursor-pointer'
+                            : 'bg-white text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] cursor-pointer'
+                        }`}
+                    >
+                      <span className="text-xs font-medium">{d.day}</span>
+                      <span className="text-lg font-bold leading-tight">{d.date}</span>
+                      <span className="text-xs">{d.month}</span>
+                      {d.label && (
+                        <span className={`text-[10px] font-bold mt-0.5 ${selectedDate === d.value ? 'text-blue-100' : 'text-[var(--color-primary)]'}`}>
+                          {d.label}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
               {errors.date && (
                 <p className="text-red-500 text-xs mt-2">{errors.date}</p>
@@ -343,46 +388,42 @@ export default function BookAppointment() {
                 <Clock className="w-5 h-5 text-[var(--color-primary)]" />
                 Select Time Slot
               </h3>
-              {Object.entries(TIME_SLOTS).map(([period, slots]) => (
-                <div key={period} className="mb-4">
-                  {/* <p className="text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-wide mb-2 capitalize">
-                    {period}
-                  </p> */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                    {slots.map((slot) => (
+              {!selectedDate ? (
+                <p className="text-sm text-[var(--color-text-secondary)]">Please select a date first to see available slots.</p>
+              ) : getSlotsForDate(selectedDate).length === 0 ? (
+                <p className="text-sm text-[var(--color-text-secondary)]">No slots available for this day.</p>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {getSlotsForDate(selectedDate).map((slot) => {
+                    const label = `${formatTime(slot.start_time)} - ${formatTime(slot.end_time)}`;
+                    const isSelected = selectedSlot?.id === slot.id;
+                    return (
                       <button
-                        key={slot}
-                        onClick={() => {
-                          setSelectedTime(slot);
-                          setErrors((p) => ({ ...p, time: "" }));
-                        }}
+                        key={slot.id}
+                        onClick={() => { setSelectedSlot({ id: slot.id, label }); setErrors((p) => ({ ...p, time: '' })); }}
                         className={`px-1 py-2 cursor-pointer rounded-xl border text-sm font-medium transition-all
-                          ${
-                            selectedTime === slot
-                              ? "bg-[var(--color-primary)] text-white border-[var(--color-primary)]"
-                              : "bg-white text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
+                          ${isSelected
+                            ? 'bg-[var(--color-primary)] text-white border-[var(--color-primary)]'
+                            : 'bg-white text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]'
                           }`}
                       >
-                        {slot}
+                        {label}
                       </button>
-                    ))}
-                  </div>
+                    );
+                  })}
                 </div>
-              ))}
-              {errors.time && (
-                <p className="text-red-500 text-xs mt-1">{errors.time}</p>
               )}
+              {errors.time && <p className="text-red-500 text-xs mt-2">{errors.time}</p>}
             </div>
 
             {/* Patient Details */}
-            <div className="bg-white rounded-2xl border border-[var(--color-border)] p-6">
+            {/* <div className="bg-white rounded-2xl border border-[var(--color-border)] p-6">
               <h3 className="font-bold text-[var(--color-text-dark)] mb-5 flex items-center gap-2">
                 <User className="w-5 h-5 text-[var(--color-primary)]" />
                 Patient Details
               </h3>
               <div className="grid sm:grid-cols-2 gap-4">
-                {/* Name */}
-                {/* <div className="sm:col-span-2">
+                <div className="sm:col-span-2">
                   <label className="text-sm font-semibold text-[var(--color-text-dark)] mb-2 block">
                     Patient Name *
                   </label>
@@ -398,9 +439,7 @@ export default function BookAppointment() {
                       {errors.patientName}
                     </p>
                   )}
-                </div> */}
-
-                {/* Age */}
+                </div>
                 <div>
                   <label className="text-sm font-semibold text-[var(--color-text-dark)] mb-2 block">
                     Age *
@@ -419,7 +458,6 @@ export default function BookAppointment() {
                   )}
                 </div>
 
-                {/* Gender */}
                 <div>
                   <label className="text-sm font-semibold text-[var(--color-text-dark)] mb-2 block">
                     Gender *
@@ -438,10 +476,6 @@ export default function BookAppointment() {
                     <p className="text-red-500 text-xs mt-1">{errors.gender}</p>
                   )}
                 </div>
-
-                {/* Phone */}
-
-                {/* Reason */}
                 <div className="sm:col-span-2">
                   <label className="text-sm font-semibold text-[var(--color-text-dark)] mb-2 block">
                     Reason for Visit{" "}
@@ -458,7 +492,7 @@ export default function BookAppointment() {
                   />
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Upload Reports */}
             <div className="bg-white rounded-2xl border border-[var(--color-border)] p-6">
@@ -555,18 +589,10 @@ export default function BookAppointment() {
 
               {/* Doctor mini */}
               <div className="flex items-center gap-3 pb-4 border-b border-[var(--color-border)] mb-4">
-                <img
-                  src={doctor.image}
-                  alt={doctor.name}
-                  className="w-12 h-12 rounded-xl object-cover object-top"
-                />
+                <img src={doctor.profile_img} alt={doctor.name} className="w-12 h-12 rounded-xl object-cover object-top" />
                 <div>
-                  <p className="font-bold text-sm text-[var(--color-text-dark)]">
-                    {doctor.name}
-                  </p>
-                  <p className="text-xs text-[var(--color-text-secondary)]">
-                    {doctor.specialty}
-                  </p>
+                  <p className="font-bold text-sm text-[var(--color-text-dark)]">{doctor.name}</p>
+                  <p className="text-xs text-[var(--color-text-secondary)]">{doctor.specialization}</p>
                 </div>
               </div>
 
@@ -594,15 +620,11 @@ export default function BookAppointment() {
                     </span>
                   </div>
                 )}
-                {selectedTime && (
+                {selectedSlot && (
                   <div className="flex items-center gap-2 text-sm">
                     <Clock className="w-4 h-4 text-[var(--color-primary)] shrink-0" />
-                    <span className="text-[var(--color-text-secondary)]">
-                      Time:
-                    </span>
-                    <span className="font-semibold text-[var(--color-text-dark)]">
-                      {selectedTime}
-                    </span>
+                    <span className="text-[var(--color-text-secondary)]">Time:</span>
+                    <span className="font-semibold text-[var(--color-text-dark)]">{selectedSlot.label}</span>
                   </div>
                 )}
                 {form.patientName && (
@@ -622,29 +644,22 @@ export default function BookAppointment() {
               {/* Fee */}
               <div className="border-t border-dashed border-[var(--color-border)] pt-4 mb-5">
                 <div className="flex justify-between text-sm mb-2">
-                  <span className="text-[var(--color-text-secondary)]">
-                    Consultation Fee
-                  </span>
-                  <span className="font-medium">₹{doctor.fee}</span>
+                  <span className="text-[var(--color-text-secondary)]">Consultation Fee</span>
+                  <span className="font-medium">₹{doctor.consultation_fee}</span>
                 </div>
                 <div className="flex justify-between text-sm mb-2">
-                  <span className="text-[var(--color-text-secondary)]">
-                    Platform Fee
-                  </span>
-                  <span className="font-medium text-[var(--color-success)]">
-                    FREE
-                  </span>
+                  <span className="text-[var(--color-text-secondary)]">Platform Fee</span>
+                  <span className="font-medium text-[var(--color-success)]">FREE</span>
                 </div>
                 <div className="flex justify-between font-bold mt-3 pt-3 border-t border-[var(--color-border)]">
-                  <span className="text-[var(--color-text-dark)]">
-                    Total Amount
-                  </span>
-                  <span className="text-xl text-[var(--color-text-dark)]">
-                    ₹{doctor.fee}
-                  </span>
+                  <span className="text-[var(--color-text-dark)]">Total Amount</span>
+                  <span className="text-xl text-[var(--color-text-dark)]">₹{doctor.consultation_fee}</span>
                 </div>
               </div>
 
+              {errors.submit && (
+                <p className="text-red-500 text-xs text-center mb-3">{errors.submit}</p>
+              )}
               <button
                 onClick={handleSubmit}
                 disabled={loading}

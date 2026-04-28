@@ -9,6 +9,7 @@ import LabTrustBar from '../components/lab/LabTrustBar';
 import CartBar from '../components/lab/CartBar';
 import Container from '../components/Container';
 import api, { apis } from '../utlities/api';
+import { useCart } from '../context/CartContext';
 
 const defaultFilters = {
   categoryId: null,
@@ -27,10 +28,10 @@ const SORT_MAP = {
 
 export default function LabTests() {
   const [filters, setFilters] = useState(defaultFilters);
-  const [activeTab, setActiveTab] = useState('all'); // 'all' or category id (number)
-  const [selected, setSelected] = useState([]);
+  const [activeTab, setActiveTab] = useState('all');
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const { addToCart, getQty, apiCart, fetchCart } = useCart();
 
   const [categories, setCategories] = useState([]);
   const [tests, setTests] = useState([]);
@@ -108,10 +109,14 @@ export default function LabTests() {
   };
 
   const handleAdd = (test) => {
-    setSelected((prev) =>
-      prev.find((t) => t.id === test.id) ? prev.filter((t) => t.id !== test.id) : [...prev, test]
-    );
+    addToCart({ id: test.id, type: 'test' }, 'test');
   };
+
+  // lab_test items from apiCart
+  const labCartItems = apiCart.filter((i) => i.type === 'lab_test');
+  const labCartCount = labCartItems.reduce((s, i) => s + i.quantity, 0);
+  const labCartTotal = labCartItems.reduce((s, i) => s + parseFloat(i.subtotal), 0);
+  const labCartOriginal = labCartItems.reduce((s, i) => s + parseFloat(i.price) * i.quantity, 0);
 
   return (
     <div className="min-h-screen bg-[var(--color-bg-main)]">
@@ -182,7 +187,7 @@ export default function LabTests() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2">
                 {tests.map((test) => {
-                  const isSelected = !!selected.find((t) => t.id === test.id);
+                  const isSelected = getQty(test.id) > 0;
                   return (
                     <div
                       key={test.id}
@@ -278,7 +283,13 @@ export default function LabTests() {
       )}
 
       <Footer />
-      <CartBar selected={selected} onClear={() => setSelected([])} />
+      <CartBar
+        labCartItems={labCartItems}
+        labCartCount={labCartCount}
+        labCartTotal={labCartTotal}
+        labCartOriginal={labCartOriginal}
+        onClear={fetchCart}
+      />
     </div>
   );
 }

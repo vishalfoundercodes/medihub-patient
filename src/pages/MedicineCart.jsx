@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, ShoppingCart, Plus, Minus, Trash2, Upload, X,
@@ -7,7 +7,8 @@ import {
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Container from '../components/Container';
-import { medicines as allMedicines } from '../data/medicinesData';
+import { useCart } from '../context/CartContext';
+import { placeOrderAPI } from '../services/cartService';
 
 const ADDRESSES = [
   { id: 1, label: 'Home', address: '12, Sector 15, Rohini, New Delhi - 110085' },
@@ -15,42 +16,47 @@ const ADDRESSES = [
 ];
 
 export default function MedicineCart() {
-  const location = useLocation();
   const navigate = useNavigate();
+  const { apiCart, summary, cartLoading, fetchCart, addToCart, removeFromCart } = useCart();
 
-  // cart: { [id]: qty } passed via state
-  const [cart, setCart] = useState(location.state?.cart || {});
   const [prescriptions, setPrescriptions] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(1);
+  const [note, setNote] = useState('');
+  const [orderResult, setOrderResult] = useState(null);
+
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [orderError, setOrderError] = useState('');
   const fileInputRef = useRef(null);
+  useEffect(() => { fetchCart(); }, []);
 
-  const cartItems = Object.entries(cart)
-    .map(([id, qty]) => ({ med: allMedicines.find((m) => m.id === Number(id)), qty }))
-    .filter((i) => i.med);
+  // Filter only medicine items from apiCart
+  const cartItems = apiCart
+    .filter((item) => item.type === 'medicine')
+    .map((item) => ({
+      id: item.id,
+      item_id: item.item_id,
+      type: item.type,
+      name: item.name,
+      image: item.image_url,
+      price: parseFloat(item.price),
+      discount: parseFloat(item.discount_percent),
+      subtotal: parseFloat(item.subtotal),
+      qty: item.quantity,
+    }));
 
-  const subtotal = cartItems.reduce((s, { med, qty }) => s + med.price * qty, 0);
-  const savings = cartItems.reduce((s, { med, qty }) => s + (med.original - med.price) * qty, 0);
-  const deliveryFee = subtotal >= 499 ? 0 : 49;
-  const total = subtotal + deliveryFee;
-
-  const updateQty = (id, delta) => {
-    setCart((prev) => {
-      const qty = (prev[id] || 0) + delta;
-      if (qty <= 0) { const next = { ...prev }; delete next[id]; return next; }
-      return { ...prev, [id]: qty };
-    });
-  };
-
-  const removeItem = (id) => {
-    setCart((prev) => { const next = { ...prev }; delete next[String(id)]; return next; });
-  };
+  // Summary only for medicine items
+  const subtotal    = cartItems.reduce((s, i) => s + i.price * i.qty, 0);
+  const savings     = cartItems.reduce((s, i) => s + (i.price * i.qty - i.subtotal), 0);
+  const totalAmount = cartItems.reduce((s, i) => s + i.subtotal, 0);
+  const deliveryFee = totalAmount >= 499 ? 0 : 49;
+  const total       = totalAmount + deliveryFee;
 
   const handleFileUpload = (e) => {
     const files = Array.from(e.target.files);
     const newFiles = files.map((file) => ({
       id: Date.now() + Math.random(),
+      file,  // keep actual File object for API
       name: file.name,
       size: (file.size / 1024).toFixed(1) + ' KB',
       type: file.type.startsWith('image/') ? 'image' : 'pdf',
@@ -62,10 +68,42 @@ export default function MedicineCart() {
 
   const removePrescription = (id) => setPrescriptions((prev) => prev.filter((p) => p.id !== id));
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     setLoading(true);
-    setTimeout(() => { setLoading(false); setSuccess(true); }, 1500);
+    setOrderError('');
+    try {
+      // prescription: first uploaded file (if any)
+      const prescriptionFile = prescriptions[0]?.file || null;
+      const res = await placeOrderAPI({
+        address_id: selectedAddress,
+        note,
+        prescription: prescriptionFile,
+      });
+      if (res.success) {
+        setOrderResult(res.data);
+        setSuccess(true);
+      } else {
+        setOrderError(res.message || 'Failed to place order. Please try again.');
+      }
+    } catch (err) {
+      setOrderError(err?.response?.data?.message || 'Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (cartLoading) {
+    return (
+      <div className="min-h-screen bg-[var(--color-bg-main)]">
+        <Navbar />
+        <Container className="py-20 text-center">
+          <Loader2 className="w-10 h-10 animate-spin text-[var(--color-primary)] mx-auto" />
+          <p className="text-sm text-[var(--color-text-secondary)] mt-4">Loading your cart...</p>
+        </Container>
+        <Footer />
+      </div>
+    );
+  }
 
   if (cartItems.length === 0 && !success) {
     return (
@@ -149,29 +187,34 @@ export default function MedicineCart() {
             <div className="bg-white rounded-2xl border border-[var(--color-border)] p-2 md:p-4">
               <h3 className="font-bold text-[var(--color-text-dark)] mb-5">Cart Items</h3>
               <div className="space-y-4">
-                {cartItems.map(({ med, qty }) => (
-                  <div key={med.id} className="flex items-center gap-4 pb-4 border-b border-[var(--color-border)] last:border-0 last:pb-0">
-                    <img src={med.image} alt={med.name} className="w-16 h-16 rounded-xl object-cover shrink-0 border border-[var(--color-border)]" />
+                {cartItems.map((item) => (
+                  <div key={item.id} className="flex items-center gap-4 pb-4 border-b border-[var(--color-border)] last:border-0 last:pb-0">
+                    <img
+                      src={item.image || 'https://placehold.co/64x64?text=Rx'}
+                      alt={item.name}
+                      className="w-16 h-16 rounded-xl object-cover shrink-0 border border-[var(--color-border)]"
+                    />
                     <div className="flex-1 min-w-0">
-                      <p className="font-bold text-sm text-[var(--color-text-dark)] leading-snug mb-0.5">{med.name}</p>
-                      <p className="text-xs text-[var(--color-text-secondary)] mb-2">{med.strip}</p>
+                      <p className="font-bold text-sm text-[var(--color-text-dark)] leading-snug mb-0.5">{item.name}</p>
+                      <p className="text-xs text-[var(--color-text-secondary)] mb-2 capitalize">{item.type.replace('_', ' ')}</p>
                       <div className="flex items-center gap-2">
-                        <span className="text-base font-bold text-[var(--color-text-dark)]">₹{med.price}</span>
-                        <span className="text-xs text-[var(--color-text-secondary)] line-through">₹{med.original}</span>
-                        <span className="text-xs font-semibold text-[var(--color-success)] bg-green-50 px-2 py-0.5 rounded-full">{med.discount}% OFF</span>
+                        <span className="text-base font-bold text-[var(--color-text-dark)]">₹{item.price}</span>
+                        {item.discount > 0 && (
+                          <span className="text-xs font-semibold text-[var(--color-success)] bg-green-50 px-2 py-0.5 rounded-full">{Math.round(item.discount)}% OFF</span>
+                        )}
                       </div>
                     </div>
                     <div className="flex flex-col md:flex-row items-center gap-3 shrink-0">
                       <div className="flex items-center border border-[var(--color-primary)] rounded-xl overflow-hidden">
-                        <button onClick={() => updateQty(String(med.id), -1)} className="px-3 py-2 cursor-pointer text-[var(--color-primary)] hover:bg-blue-50 transition-colors">
+                        <button onClick={() => removeFromCart(item.item_id)} className="px-3 py-2 cursor-pointer text-[var(--color-primary)] hover:bg-blue-50 transition-colors">
                           <Minus className="w-3.5 h-3.5" />
                         </button>
-                        <span className="px-3 font-bold text-sm text-[var(--color-text-dark)]">{qty}</span>
-                        <button onClick={() => updateQty(String(med.id), 1)} className="px-3 py-2 cursor-pointer text-[var(--color-primary)] hover:bg-blue-50 transition-colors">
+                        <span className="px-3 font-bold text-sm text-[var(--color-text-dark)]">{item.qty}</span>
+                        <button onClick={() => addToCart({ id: item.item_id, type: item.type }, item.type)} className="px-3 py-2 cursor-pointer text-[var(--color-primary)] hover:bg-blue-50 transition-colors">
                           <Plus className="w-3.5 h-3.5" />
                         </button>
                       </div>
-                      <button onClick={() => removeItem(med.id)} className="w-8 h-8 cursor-pointer rounded-xl hover:bg-red-50 flex items-center justify-center transition-colors">
+                      <button onClick={() => removeFromCart(item.item_id)} className="w-8 h-8 cursor-pointer rounded-xl hover:bg-red-50 flex items-center justify-center transition-colors">
                         <Trash2 className="w-4 h-4 text-[var(--color-text-secondary)] hover:text-red-500" />
                       </button>
                     </div>
@@ -284,7 +327,7 @@ export default function MedicineCart() {
 
               {deliveryFee > 0 && (
                 <p className="text-xs text-[var(--color-text-secondary)] bg-yellow-50 border border-yellow-100 rounded-xl px-3 py-2">
-                  Add ₹{499 - subtotal} more for <span className="font-semibold text-yellow-700">FREE delivery</span>
+                  Add ₹{499 - totalAmount} more for <span className="font-semibold text-yellow-700">FREE delivery</span>
                 </p>
               )}
 
@@ -292,6 +335,22 @@ export default function MedicineCart() {
                 <span className="text-[var(--color-text-dark)]">Total Amount</span>
                 <span className="text-xl text-[var(--color-text-dark)]">₹{total}</span>
               </div>
+
+              {/* Note */}
+              <div>
+                <label className="text-sm font-semibold text-[var(--color-text-dark)] mb-2 block">Delivery Note (Optional)</label>
+                <textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="e.g. Please deliver before 4pm"
+                  rows={2}
+                  className="w-full px-4 py-3 border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] resize-none"
+                />
+              </div>
+
+              {orderError && (
+                <p className="text-red-500 text-xs bg-red-50 border border-red-100 rounded-xl px-3 py-2">{orderError}</p>
+              )}
 
               <button
                 onClick={handlePlaceOrder}

@@ -1,10 +1,12 @@
 import { LayoutGrid, Clock, CheckCircle, XCircle, SlidersHorizontal, ChevronDown } from 'lucide-react';
 
 const tabs = [
-  { id: 'all', label: 'All Appointments', icon: LayoutGrid },
-  { id: 'Upcoming', label: 'Upcoming', icon: Clock },
-  { id: 'Completed', label: 'Completed', icon: CheckCircle },
-  { id: 'Cancelled', label: 'Cancelled', icon: XCircle },
+  { id: 'all',       label: 'All Appointments', icon: LayoutGrid },
+  { id: 'pending',   label: 'Pending',           icon: Clock },
+  { id: 'upcoming',  label: 'Upcoming',          icon: Clock },
+  { id: 'completed', label: 'Completed',         icon: CheckCircle },
+  { id: 'cancelled', label: 'Cancelled',         icon: XCircle },
+  { id: 'rejected',  label: 'Rejected',          icon: XCircle },
 ];
 
 export default function AppointmentFilters({ active, onChange }) {

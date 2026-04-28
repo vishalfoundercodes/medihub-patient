@@ -12,7 +12,8 @@ import AppointmentHelpBar from '../components/appointments/AppointmentHelpBar';
 import UpcomingAppointmentCard from '../components/appointments/UpcomingAppointmentCard';
 import AppointmentQuickActions from '../components/appointments/AppointmentQuickActions';
 import { useAuth } from '../context/AuthContext';
-import { APPOINTMENTS } from '../data/appointmentsData';
+import api, { apis } from '../utlities/api';
+import { Loader2 } from 'lucide-react';
 
 const PER_PAGE = 5;
 
@@ -23,29 +24,51 @@ export default function Appointments() {
   const [activeTab, setActiveTab] = useState('all');
   const [page, setPage] = useState(1);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) { setShowLogin(true); navigate('/'); }
+    if (!user) { setShowLogin(true); navigate('/'); return; }
+    const fetch = async () => {
+      try {
+        const res = await api.get(apis.appointmentHistory);
+        if (res.data.success) {
+          const d = res.data.data;
+          const all = [
+            ...(d.pending || []),
+            ...(d.upcoming || []),
+            ...(d.completed || []),
+            ...(d.cancelled || []),
+            ...(d.rejected || []),
+          ];
+          setAppointments(all);
+        }
+      } catch (err) {
+        console.error('Failed to fetch appointments:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetch();
   }, [user]);
 
   if (!user) return null;
 
-  // Next upcoming appointment for right sidebar
-  const nextUpcoming = APPOINTMENTS.find((a) => a.status === 'Upcoming' && a.hospital);
+  const nextUpcoming = appointments.find((a) => a.status === 'upcoming');
 
   const filtered = useMemo(() => {
-    let result = [...APPOINTMENTS];
+    let result = [...appointments];
     if (activeTab !== 'all') result = result.filter((a) => a.status === activeTab);
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter((a) =>
-        a.name.toLowerCase().includes(q) ||
-        a.specialty.toLowerCase().includes(q) ||
-        a.id.toLowerCase().includes(q)
+        a.doctor_name?.toLowerCase().includes(q) ||
+        a.specialization?.toLowerCase().includes(q) ||
+        String(a.id).includes(q)
       );
     }
     return result;
-  }, [activeTab, search]);
+  }, [activeTab, search, appointments]);
 
   const resetPage = (fn) => (...args) => { fn(...args); setPage(1); };
   const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
@@ -101,7 +124,11 @@ export default function Appointments() {
                 <AppointmentFilters active={activeTab} onChange={resetPage(setActiveTab)} />
 
                 {/* Cards */}
-                {paginated.length > 0 ? (
+                {loading ? (
+                  <div className="flex justify-center py-16">
+                    <Loader2 className="w-8 h-8 animate-spin text-[var(--color-primary)]" />
+                  </div>
+                ) : paginated.length > 0 ? (
                   <div className="space-y-4">
                     {paginated.map((appt) => (
                       <AppointmentCard key={appt.id} appointment={appt} />

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const base_url = 'https://medihub.giftaura.shop/';
+export const base_url = "http://localhost:3002/";
 
 const api = axios.create({
   baseURL: `${base_url}api/`,
@@ -38,6 +38,16 @@ export const apis = {
   privacyPolicy: "policies/privacy_policy",
   termsConditions: "policies/terms_conditions",
   cancellationPolicy: "policies/cancellation_policy",
+  // ---------------------------------------------
+  addToCart: "cart/add",
+  getCart: "cart",
+  orderPlace: "orders/place",
+  getOrders: "orders",
+  getOrderDetail: "orders",
+  getDoctorDetail: "doctors",
+  bookAppointment: "appointments",
+  appointmentHistory: "appointments/history",
+  appointmentDetail: "appointments",
 };
 
 export default api;

@@ -10,32 +10,40 @@ import OrderCard from '../components/orders/OrderCard';
 import OrderPagination from '../components/orders/OrderPagination';
 import OrderHelpBar from '../components/orders/OrderHelpBar';
 import { useAuth } from '../context/AuthContext';
-import { MOCK_ORDERS } from '../context/AuthContext';
+import { getOrdersAPI } from '../services/cartService';
+import { Loader2 } from 'lucide-react';
 
 const PER_PAGE = 5;
 
-// Generate more mock orders for pagination demo
-const ALL_ORDERS = [
-  ...MOCK_ORDERS,
-  { id: 'MC123451', type: 'Medicines', date: 'Apr 28, 2024', amount: 320, status: 'Delivered', items: 2, deliveryLabel: 'Delivered on', deliveryDate: 'Apr 30, 2024', address: 'New Delhi, 110001' },
-  { id: 'MC123450', type: 'Lab Test', date: 'Apr 25, 2024', amount: 799, status: 'Completed', items: 1, deliveryLabel: 'Completed on', deliveryDate: 'Apr 25, 2024', address: 'New Delhi, 110001' },
-  { id: 'MC123449', type: 'Appointment', date: 'Apr 20, 2024', amount: 499, status: 'Confirmed', items: 1, deliveryLabel: 'Appointment on', deliveryDate: 'Apr 22, 2024 at 11:00 AM', address: 'Dr. Rajesh Kumar' },
-  { id: 'MC123448', type: 'Medicines', date: 'Apr 15, 2024', amount: 1100, status: 'Delivered', items: 4, deliveryLabel: 'Delivered on', deliveryDate: 'Apr 17, 2024', address: 'New Delhi, 110001' },
-  { id: 'MC123447', type: 'Lab Test', date: 'Apr 10, 2024', amount: 549, status: 'Completed', items: 1, deliveryLabel: 'Completed on', deliveryDate: 'Apr 10, 2024', address: 'New Delhi, 110001' },
-  { id: 'MC123446', type: 'Medicines', date: 'Apr 05, 2024', amount: 875, status: 'Delivered', items: 3, deliveryLabel: 'Delivered on', deliveryDate: 'Apr 07, 2024', address: 'New Delhi, 110001' },
-  { id: 'MC123445', type: 'Appointment', date: 'Mar 30, 2024', amount: 600, status: 'Confirmed', items: 1, deliveryLabel: 'Appointment on', deliveryDate: 'Apr 01, 2024 at 02:00 PM', address: 'Dr. Neha Singh' },
-  { id: 'MC123444', type: 'Lab Test', date: 'Mar 25, 2024', amount: 999, status: 'Completed', items: 2, deliveryLabel: 'Completed on', deliveryDate: 'Mar 25, 2024', address: 'New Delhi, 110001' },
-  { id: 'MC123443', type: 'Medicines', date: 'Mar 20, 2024', amount: 450, status: 'Delivered', items: 2, deliveryLabel: 'Delivered on', deliveryDate: 'Mar 22, 2024', address: 'New Delhi, 110001' },
-  { id: 'MC123442', type: 'Medicines', date: 'Mar 15, 2024', amount: 230, status: 'Delivered', items: 1, deliveryLabel: 'Delivered on', deliveryDate: 'Mar 17, 2024', address: 'New Delhi, 110001' },
-  { id: 'MC123441', type: 'Lab Test', date: 'Mar 10, 2024', amount: 649, status: 'Completed', items: 1, deliveryLabel: 'Completed on', deliveryDate: 'Mar 10, 2024', address: 'New Delhi, 110001' },
-  { id: 'MC123440', type: 'Appointment', date: 'Mar 05, 2024', amount: 499, status: 'Confirmed', items: 1, deliveryLabel: 'Appointment on', deliveryDate: 'Mar 07, 2024 at 10:00 AM', address: 'Dr. Amit Verma' },
-  { id: 'MC123439', type: 'Medicines', date: 'Mar 01, 2024', amount: 780, status: 'Delivered', items: 3, deliveryLabel: 'Delivered on', deliveryDate: 'Mar 03, 2024', address: 'New Delhi, 110001' },
-  { id: 'MC123438', type: 'Lab Test', date: 'Feb 25, 2024', amount: 899, status: 'Completed', items: 1, deliveryLabel: 'Completed on', deliveryDate: 'Feb 25, 2024', address: 'New Delhi, 110001' },
-  { id: 'MC123437', type: 'Medicines', date: 'Feb 20, 2024', amount: 560, status: 'Delivered', items: 2, deliveryLabel: 'Delivered on', deliveryDate: 'Feb 22, 2024', address: 'New Delhi, 110001' },
-  { id: 'MC123436', type: 'Appointment', date: 'Feb 15, 2024', amount: 700, status: 'Confirmed', items: 1, deliveryLabel: 'Appointment on', deliveryDate: 'Feb 17, 2024 at 03:00 PM', address: 'Dr. Priya Sharma' },
-  { id: 'MC123435', type: 'Lab Test', date: 'Feb 10, 2024', amount: 1199, status: 'Completed', items: 3, deliveryLabel: 'Completed on', deliveryDate: 'Feb 10, 2024', address: 'New Delhi, 110001' },
-  { id: 'MC123434', type: 'Medicines', date: 'Feb 05, 2024', amount: 340, status: 'Delivered', items: 2, deliveryLabel: 'Delivered on', deliveryDate: 'Feb 07, 2024', address: 'New Delhi, 110001' },
-];
+// Status mapping from API to display
+const STATUS_MAP = {
+  placed:    'Processing',
+  confirmed: 'Confirmed',
+  shipped:   'Shipped',
+  delivered: 'Delivered',
+  completed: 'Completed',
+  cancelled: 'Cancelled',
+};
+
+// Type mapping from API items to display
+// Priority: if mixed → show by first item type
+const getOrderType = (items) => {
+  if (!items?.length) return 'Medicines';
+  const types = [...new Set(items.map((i) => i.type))];
+  if (types.includes('lab_test') && types.length === 1) return 'Lab Test';
+  if (types.includes('medicine') && types.length === 1) return 'Medicines';
+  if (types.includes('appointment')) return 'Appointment';
+  // Mixed order — use first item type
+  return types[0] === 'lab_test' ? 'Lab Test' : 'Medicines';
+};
+
+// Delivery label based on status
+const getDeliveryLabel = (status) => {
+  if (status === 'delivered' || status === 'completed') return 'Delivered on';
+  if (status === 'cancelled') return 'Cancelled on';
+  if (status === 'shipped') return 'Shipped on';
+  return 'Order placed on';
+};
 
 export default function Orders() {
   const { user, setShowLogin } = useAuth();
@@ -44,15 +52,55 @@ export default function Orders() {
   const [activeTab, setActiveTab] = useState('all');
   const [page, setPage] = useState(1);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!user) { setShowLogin(true); navigate('/'); }
+    if (!user) { setShowLogin(true); navigate('/'); return; }
+    fetchOrders();
   }, [user]);
+
+  const fetchOrders = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const res = await getOrdersAPI();
+      if (res.success) {
+        // Map API response to display format
+        const mapped = res.data.orders.map((o) => {
+          const displayDate = new Date(o.created_at).toLocaleDateString('en-IN', {
+            day: 'numeric', month: 'short', year: 'numeric'
+          });
+          return {
+            id: o.uid,
+            type: getOrderType(o.items),
+            date: displayDate,
+            amount: parseFloat(o.total_amount),
+            status: STATUS_MAP[o.status] || o.status,
+            items: o.total_items,
+            deliveryLabel: getDeliveryLabel(o.status),
+            deliveryDate: displayDate,
+            address: `${o.city}, ${o.pincode}`,
+            note: o.note,
+            apiItems: o.items,
+          };
+        });
+        setOrders(mapped);
+      } else {
+        setError(res.message || 'Failed to load orders.');
+      }
+    } catch (err) {
+      setError(err?.response?.data?.message || 'Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!user) return null;
 
   const filtered = useMemo(() => {
-    let result = [...ALL_ORDERS];
+    let result = [...orders];
     if (activeTab !== 'all') result = result.filter((o) => o.type === activeTab);
     if (search.trim()) {
       const q = search.toLowerCase();
@@ -63,7 +111,7 @@ export default function Orders() {
       );
     }
     return result;
-  }, [activeTab, search]);
+  }, [activeTab, search, orders]);
 
   // Reset to page 1 on filter/search change
   const resetPage = (fn) => (...args) => { fn(...args); setPage(1); };
@@ -114,7 +162,16 @@ export default function Orders() {
             <OrderFilters active={activeTab} onChange={resetPage(setActiveTab)} />
 
             {/* Order list */}
-            {paginated.length > 0 ? (
+            {loading ? (
+              <div className="flex justify-center py-16">
+                <Loader2 className="w-8 h-8 animate-spin text-[var(--color-primary)]" />
+              </div>
+            ) : error ? (
+              <div className="bg-white rounded-2xl border border-[var(--color-border)] p-10 text-center">
+                <p className="text-red-500 text-sm mb-3">{error}</p>
+                <button onClick={fetchOrders} className="text-sm font-semibold text-[var(--color-primary)] hover:underline">Retry</button>
+              </div>
+            ) : paginated.length > 0 ? (
               <div className="space-y-4">
                 {paginated.map((order) => (
                   <OrderCard key={order.id} order={order} />

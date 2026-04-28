@@ -9,6 +9,7 @@ import MedicineFilters from '../components/medicines/MedicineFilters';
 import MedicineTrustBar from '../components/medicines/MedicineTrustBar';
 import Container from '../components/Container';
 import api, { apis } from '../utlities/api';
+import { useCart } from '../context/CartContext';
 
 const defaultFilters = {
   categoryId: null,
@@ -28,11 +29,12 @@ const SORT_MAP = {
 
 export default function Medicines() {
   const navigate = useNavigate();
+  const { addToCart: addToCartGlobal, removeFromCart: removeFromCartGlobal, getQty, cartCount, cartTotal } = useCart();
   const [activeTab, setActiveTab] = useState('all');
   const [filters, setFilters] = useState(defaultFilters);
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
-  const [cart, setCart] = useState({});
+  // cart state is managed globally via CartContext
 
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
@@ -116,18 +118,8 @@ export default function Medicines() {
     });
   };
 
-  const addToCart = (med) => setCart((prev) => ({ ...prev, [med.id]: (prev[med.id] || 0) + 1 }));
-  const removeFromCart = (id) => setCart((prev) => {
-    const qty = (prev[id] || 0) - 1;
-    if (qty <= 0) { const next = { ...prev }; delete next[id]; return next; }
-    return { ...prev, [id]: qty };
-  });
-
-  const cartCount = Object.values(cart).reduce((a, b) => a + b, 0);
-  const cartTotal = Object.entries(cart).reduce((sum, [id, qty]) => {
-    const med = medicines.find((m) => m.id === Number(id));
-    return sum + (med ? Math.round(med.discounted_price) * qty : 0);
-  }, 0);
+  const addToCart = (med) => addToCartGlobal(med, 'medicine');
+  const removeFromCart = (id) => removeFromCartGlobal(id);
 
   return (
     <div className="min-h-screen bg-[var(--color-bg-main)]">
@@ -137,7 +129,7 @@ export default function Medicines() {
         onSearch={setSearchQuery}
         cartCount={cartCount}
         cartTotal={cartTotal}
-        onCartClick={() => navigate('/medicine-cart', { state: { cart } })}
+        onCartClick={() => navigate('/medicine-cart')}
       />
       <MedicineCategoryTabs categories={categories} active={activeTab} onChange={handleTabChange} />
 
@@ -205,7 +197,7 @@ export default function Medicines() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                 {medicines.map((med) => {
-                  const qty = cart[med.id] || 0;
+                  const qty = getQty(med.id);
                   const saved = Math.round(med.price - med.discounted_price);
                   return (
                     <div key={med.id} className="bg-white rounded-2xl border border-[var(--color-border)] hover:border-blue-200 hover:shadow-lg transition-all duration-200 overflow-hidden">

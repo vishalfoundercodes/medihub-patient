@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, User, Calendar, MapPin, Home, Plus,
   CheckCircle, Loader2, FlaskConical, Trash2, ShieldCheck
@@ -7,38 +7,32 @@ import {
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Container from '../components/Container';
+import { useCart } from '../context/CartContext';
+import { placeOrderAPI } from '../services/cartService';
 
 const SAVED_ADDRESSES = [
-  {
-    id: 1, label: 'Home',
-    address: 'A-45, 2nd Floor, Green Park Extension',
-    city: 'New Delhi', pincode: '110016', default: true,
-  },
-  {
-    id: 2, label: 'Office',
-    address: 'B-12, Connaught Place',
-    city: 'New Delhi', pincode: '110001', default: false,
-  },
+  { id: 1, label: 'Home', address: 'A-45, 2nd Floor, Green Park Extension', city: 'New Delhi', pincode: '110016', default: true },
+  { id: 2, label: 'Office', address: 'B-12, Connaught Place', city: 'New Delhi', pincode: '110001', default: false },
 ];
 
-const TIME_SLOTS = [
-  '7:00 AM - 8:00 AM',
-  '8:00 AM - 9:00 AM',
-  '9:00 AM - 10:00 AM',
-  '10:00 AM - 11:00 AM',
-  '11:00 AM - 12:00 PM',
-  '2:00 PM - 3:00 PM',
-  '3:00 PM - 4:00 PM',
-];
+// Format time: "09:00:00" → "9:00 AM"
+const formatTime = (t) => {
+  const [h, m] = t.split(':').map(Number);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const hour = h % 12 || 12;
+  return `${hour}:${String(m).padStart(2, '0')} ${ampm}`;
+};
 
-// Get next 7 dates
+// Get next 7 dates with day name
 const getAvailableDates = () => {
+  const days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
   const dates = [];
   for (let i = 1; i <= 7; i++) {
     const d = new Date();
     d.setDate(d.getDate() + i);
     dates.push({
       value: d.toISOString().split('T')[0],
+      dayKey: days[d.getDay()],
       label: d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }),
       isToday: i === 1,
     });
@@ -47,9 +41,24 @@ const getAvailableDates = () => {
 };
 
 export default function LabCheckout() {
-  const { state } = useLocation();
   const navigate = useNavigate();
-  const selected = state?.selected || [];
+  const { apiCart, fetchCart, cartLoading, labSlots } = useCart();
+
+  useEffect(() => { fetchCart(); }, []);
+
+  // Only lab_test items
+  const tests = apiCart
+    .filter((i) => i.type === 'lab_test')
+    .map((i) => ({
+      id: i.id,
+      item_id: i.item_id,
+      name: i.name,
+      image: i.image_url,
+      price: parseFloat(i.subtotal),
+      original: parseFloat(i.price) * i.quantity,
+      discount: parseFloat(i.discount_percent),
+      qty: i.quantity,
+    }));
 
   const [form, setForm] = useState({
     patientName: '',
@@ -63,7 +72,9 @@ export default function LabCheckout() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [showAddAddress, setShowAddAddress] = useState(false);
-  const [tests, setTests] = useState(selected);
+  const [note, setNote] = useState('');
+  const [orderError, setOrderError] = useState('');
+  const [selectedSlotId, setSelectedSlotId] = useState(null);
 
   const dates = getAvailableDates();
 
@@ -78,24 +89,60 @@ export default function LabCheckout() {
 
   const validate = () => {
     const e = {};
-    // if (!form.patientName.trim()) e.patientName = 'Patient name is required';
-    if (!form.age || isNaN(form.age) || form.age < 1) e.age = 'Valid age is required';
-    if (!form.gender) e.gender = 'Gender is required';
+    // if (!form.age || isNaN(form.age) || form.age < 1) e.age = 'Valid age is required';
+    // if (!form.gender) e.gender = 'Gender is required';
     if (!form.date) e.date = 'Please select a date';
-    if (!form.timeSlot) e.timeSlot = 'Please select a time slot';
+    if (!selectedSlotId) e.timeSlot = 'Please select a time slot';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (!validate()) return;
+  const handleSubmit = async () => {
+    if (!validate()) {
+      // Scroll to first error
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
     setLoading(true);
-    setTimeout(() => { setLoading(false); setSuccess(true); }, 1500);
+    setOrderError('');
+    try {
+      console.log('[LabCheckout] Placing order:', { address_id: form.addressId, note, lab_test_slot_id: selectedSlotId });
+      const res = await placeOrderAPI({
+        address_id: form.addressId,
+        note,
+        lab_test_slot_id: selectedSlotId,
+        lab_test_booking_date:form.date,
+      });
+      console.log('[LabCheckout] Order response:', res);
+      if (res.success) {
+        setSuccess(true);
+      } else {
+        setOrderError(res.message || 'Failed to place order. Please try again.');
+      }
+    } catch (err) {
+      console.error('[LabCheckout] Order error:', err?.response?.data || err.message);
+      setOrderError(err?.response?.data?.message || 'Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const removeTest = (id) => setTests((p) => p.filter((t) => t.id !== id));
+  const removeTest = () => {};
 
   const selectedAddress = SAVED_ADDRESSES.find((a) => a.id === form.addressId);
+
+  if (cartLoading) {
+    return (
+      <div className="min-h-screen bg-[var(--color-bg-main)]">
+        <Navbar />
+        <Container className="py-20 text-center">
+          <Loader2 className="w-10 h-10 animate-spin text-[var(--color-primary)] mx-auto" />
+          <p className="text-sm text-[var(--color-text-secondary)] mt-4">Loading your cart...</p>
+        </Container>
+        <Footer />
+      </div>
+    );
+  }
 
   if (tests.length === 0 && !success) {
     return (
@@ -134,12 +181,12 @@ export default function LabCheckout() {
             {/* Booking summary */}
             <div className="bg-[var(--color-bg-section)] rounded-2xl p-4 text-left mb-6 space-y-2">
               <p className="text-xs font-semibold text-[var(--color-text-secondary)] mb-2">BOOKING DETAILS</p>
-              <div className="flex justify-between text-sm">
+              {/* <div className="flex justify-between text-sm">
                 <span className="text-[var(--color-text-secondary)]">Patient</span>
                 <span className="font-semibold text-[var(--color-text-dark)]">
-                  {/* {form.patientName}, */}
+                 
                    {form.age} yrs ({form.gender})</span>
-              </div>
+              </div> */}
               <div className="flex justify-between text-sm">
                 <span className="text-[var(--color-text-secondary)]">Tests</span>
                 <span className="font-semibold text-[var(--color-text-dark)]">{tests.length} test{tests.length > 1 ? 's' : ''}</span>
@@ -212,15 +259,13 @@ export default function LabCheckout() {
             </div>
 
             {/* Patient Details */}
-            <div className="bg-white rounded-2xl border border-[var(--color-border)] p-6">
+            {/* <div className="bg-white rounded-2xl border border-[var(--color-border)] p-6">
               <h3 className="font-bold text-[var(--color-text-dark)] mb-5 flex items-center gap-2">
                 <User className="w-5 h-5 text-[var(--color-primary)]" />
                 Patient Details
               </h3>
               <div className="grid sm:grid-cols-2 gap-4">
-
-                {/* Name */}
-                {/* <div className="sm:col-span-2">
+                <div className="sm:col-span-2">
                   <label className="text-sm font-semibold text-[var(--color-text-dark)] mb-2 block">Patient Name *</label>
                   <input
                     type="text"
@@ -230,9 +275,7 @@ export default function LabCheckout() {
                     className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] ${errors.patientName ? 'border-red-400' : 'border-[var(--color-border)]'}`}
                   />
                   {errors.patientName && <p className="text-red-500 text-xs mt-1">{errors.patientName}</p>}
-                </div> */}
-
-                {/* Age */}
+                </div>
                 <div>
                   <label className="text-sm font-semibold text-[var(--color-text-dark)] mb-2 block">Age *</label>
                   <input
@@ -245,8 +288,6 @@ export default function LabCheckout() {
                   />
                   {errors.age && <p className="text-red-500 text-xs mt-1">{errors.age}</p>}
                 </div>
-
-                {/* Gender */}
                 <div>
                   <label className="text-sm font-semibold text-[var(--color-text-dark)] mb-2 block">Gender *</label>
                   <select
@@ -262,7 +303,7 @@ export default function LabCheckout() {
                   {errors.gender && <p className="text-red-500 text-xs mt-1">{errors.gender}</p>}
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Date & Time */}
             <div className="bg-white rounded-2xl border border-[var(--color-border)] p-6">
@@ -275,44 +316,67 @@ export default function LabCheckout() {
               <div className="mb-5">
                 <label className="text-sm font-semibold text-[var(--color-text-dark)] mb-3 block">Collection Date *</label>
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-2 overflow-x-auto scrollbar-hide pb-1">
-                  {dates.map((d) => (
-                    <button
-                      key={d.value}
-                      onClick={() => set('date', d.value)}
-                      className={`flex flex-col items-center px-4 py-3 rounded-xl border text-sm font-medium whitespace-nowrap transition-all shrink-0
-                        ${form.date === d.value
-                          ? 'bg-[var(--color-primary)] text-white border-[var(--color-primary)] shadow-md shadow-blue-100'
-                          : 'bg-white text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]'
-                        }`}
-                    >
-                      <span className="text-xs">{d.label.split(' ')[0]}</span>
-                      <span className="font-bold">{d.label.split(' ')[1]}</span>
-                      <span className="text-xs">{d.label.split(' ')[2]}</span>
-                      {d.isToday && <span className="text-[10px] mt-0.5 font-semibold">Tomorrow</span>}
-                    </button>
-                  ))}
+                  {dates.map((d) => {
+                    // Check if this day has any slots in labSlots
+                    const allSlots = Object.values(labSlots).flatMap((dayMap) => dayMap[d.dayKey] || []);
+                    const hasSlots = allSlots.length > 0;
+                    return (
+                      <button
+                        key={d.value}
+                        onClick={() => { if (hasSlots) { set('date', d.value); setSelectedSlotId(null); } }}
+                        disabled={!hasSlots}
+                        className={`flex flex-col items-center px-4 py-3 rounded-xl border text-sm font-medium whitespace-nowrap transition-all shrink-0
+                          ${!hasSlots ? 'opacity-40 cursor-not-allowed bg-gray-50 border-[var(--color-border)]'
+                          : form.date === d.value
+                            ? 'bg-[var(--color-primary)] text-white border-[var(--color-primary)] shadow-md shadow-blue-100'
+                            : 'bg-white text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]'
+                          }`}
+                      >
+                        <span className="text-xs">{d.label.split(' ')[0]}</span>
+                        <span className="font-bold">{d.label.split(' ')[1]}</span>
+                        <span className="text-xs">{d.label.split(' ')[2]}</span>
+                        {d.isToday && <span className="text-[10px] mt-0.5 font-semibold">Tomorrow</span>}
+                      </button>
+                    );
+                  })}
                 </div>
                 {errors.date && <p className="text-red-500 text-xs mt-1">{errors.date}</p>}
               </div>
 
-              {/* Time slots */}
+              {/* Time slots — from API */}
               <div>
                 <label className="text-sm font-semibold text-[var(--color-text-dark)] mb-3 block">Time Slot *</label>
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                  {TIME_SLOTS.map((slot) => (
-                    <button
-                      key={slot}
-                      onClick={() => set('timeSlot', slot)}
-                      className={`px-1 py-2.5 rounded-xl border text-xs font-semibold transition-all
-                        ${form.timeSlot === slot
-                          ? 'bg-[var(--color-primary)] text-white border-[var(--color-primary)]'
-                          : 'bg-white text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]'
-                        }`}
-                    >
-                      {slot}
-                    </button>
-                  ))}
-                </div>
+                {form.date ? (() => {
+                  const selectedDay = dates.find((d) => d.value === form.date);
+                  const daySlots = selectedDay
+                    ? Object.values(labSlots).flatMap((dayMap) => dayMap[selectedDay.dayKey] || [])
+                    : [];
+                  return daySlots.length > 0 ? (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {daySlots.map((slot) => (
+                        <button
+                          key={slot.id}
+                          onClick={() => { setSelectedSlotId(slot.id); setErrors((p) => ({ ...p, timeSlot: '' })); }}
+                          className={`px-3 py-2.5 rounded-xl border text-xs font-semibold transition-all
+                            ${selectedSlotId === slot.id
+                              ? 'bg-[var(--color-primary)] text-white border-[var(--color-primary)]'
+                              : 'bg-white text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]'
+                            }`}
+                        >
+                          {formatTime(slot.start_time)} - {formatTime(slot.end_time)}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-[var(--color-text-secondary)] bg-[var(--color-bg-section)] rounded-xl px-4 py-3">
+                      No slots available for this day
+                    </p>
+                  );
+                })() : (
+                  <p className="text-sm text-[var(--color-text-secondary)] bg-[var(--color-bg-section)] rounded-xl px-4 py-3">
+                    Please select a date first
+                  </p>
+                )}
                 {errors.timeSlot && <p className="text-red-500 text-xs mt-1">{errors.timeSlot}</p>}
               </div>
             </div>
@@ -401,22 +465,51 @@ export default function LabCheckout() {
                 <span className="font-bold text-xl text-[var(--color-text-dark)]">₹{total.toLocaleString()}</span>
               </div>
 
-              {/* Booking info preview */}
+              {/* Note */}
+              <div className="mb-4">
+                <label className="text-sm font-semibold text-[var(--color-text-dark)] mb-2 block">Note (Optional)</label>
+                <textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="e.g. Please collect before 9am"
+                  rows={2}
+                  className="w-full px-4 py-3 border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] resize-none"
+                />
+              </div>
+
+              {orderError && (
+                <p className="text-red-500 text-xs bg-red-50 border border-red-100 rounded-xl px-3 py-2 mb-3">{orderError}</p>
+              )}
+
+              {/* Validation summary */}
+              {/* {Object.keys(errors).length > 0 && (
+                <div className="bg-red-50 border border-red-100 rounded-xl px-3 py-2 mb-3">
+                  <p className="text-xs font-semibold text-red-600 mb-1">Please fix the following:</p>
+                  {Object.values(errors).map((e, i) => (
+                    <p key={i} className="text-xs text-red-500">• {e}</p>
+                  ))}
+                </div>
+              )} */}
               {(form.patientName || form.date || selectedAddress) && (
                 <div className="bg-[var(--color-bg-section)] rounded-xl p-3 mb-4 space-y-1.5">
                   {form.patientName && (
                     <p className="text-xs text-[var(--color-text-secondary)]">
                       {/* 👤 <span className="font-semibold text-[var(--color-text-dark)]">{form.patientName}</span> */}
-                      {form.age && `, ${form.age} yrs`}
-                      {form.gender && ` (${form.gender})`}
+                      {/* {form.age && `, ${form.age} yrs`}
+                      {form.gender && ` (${form.gender})`} */}
                     </p>
                   )}
-                  {form.date && (
-                    <p className="text-xs text-[var(--color-text-secondary)]">
-                      📅 <span className="font-semibold text-[var(--color-text-dark)]">{form.date}</span>
-                      {form.timeSlot && ` • ${form.timeSlot}`}
-                    </p>
-                  )}
+                  {form.date && (() => {
+                    const selectedDay = dates.find((d) => d.value === form.date);
+                    const daySlots = selectedDay ? Object.values(labSlots).flatMap((dm) => dm[selectedDay.dayKey] || []) : [];
+                    const slot = daySlots.find((s) => s.id === selectedSlotId);
+                    return (
+                      <p className="text-xs text-[var(--color-text-secondary)]">
+                        📅 <span className="font-semibold text-[var(--color-text-dark)]">{form.date}</span>
+                        {slot && ` • ${formatTime(slot.start_time)} - ${formatTime(slot.end_time)}`}
+                      </p>
+                    );
+                  })()}
                   {selectedAddress && (
                     <p className="text-xs text-[var(--color-text-secondary)]">
                       📍 <span className="font-semibold text-[var(--color-text-dark)]">{selectedAddress.label}</span> — {selectedAddress.address}

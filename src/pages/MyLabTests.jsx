@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -6,7 +6,7 @@ import Container from '../components/Container';
 import AccountSidebar from '../components/account/AccountSidebar';
 import { useAuth } from '../context/AuthContext';
 import { MY_LAB_TESTS } from '../data/labTestDetailData';
-import { FlaskConical, ChevronRight, Download, FileText } from 'lucide-react';
+import { FlaskConical, ChevronRight, Download, Menu } from 'lucide-react';
 
 const statusStyle = {
   Completed:     'bg-blue-100 text-[var(--color-primary)]',
@@ -45,6 +45,7 @@ function handleDownload(e, test) {
 export default function MyLabTests() {
   const { user, setShowLogin } = useAuth();
   const navigate = useNavigate();
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!user) { setShowLogin(true); navigate('/'); }
@@ -56,9 +57,29 @@ export default function MyLabTests() {
     <div className="min-h-screen bg-[var(--color-bg-main)]">
       <Navbar />
       <Container className="py-8">
+
+        {/* Mobile sidebar toggle */}
+        <button
+          onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+          className="lg:hidden mb-4 flex items-center gap-2 border border-[var(--color-border)] px-4 py-2.5 rounded-xl text-sm font-medium text-[var(--color-text-dark)] bg-white hover:border-[var(--color-primary)] transition-all"
+        >
+          <Menu className="w-4 h-4" /> Account Menu
+        </button>
+
         <div className="flex gap-7 items-start">
-          <div className="hidden lg:block w-64 shrink-0">
-            <AccountSidebar active="labtests" onChange={() => {}} />
+          {/* Sidebar */}
+          <div className={`${mobileSidebarOpen ? 'block' : 'hidden'} lg:block w-full lg:w-64 shrink-0`}>
+            <AccountSidebar
+              active="labtests"
+              onChange={(id) => {
+                setMobileSidebarOpen(false);
+                if (id === 'account') navigate('/account');
+                else if (id === 'orders') navigate('/orders');
+                else if (id === 'appointments') navigate('/appointments');
+                else if (id === 'notifications') navigate('/notifications');
+                else if (id === 'help') navigate('/help-support');
+              }}
+            />
           </div>
           <div className="flex-1 min-w-0 space-y-5">
             <div>
