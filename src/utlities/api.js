@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const base_url = "http://localhost:3002/";
+export const base_url = "https://root.medihub1.co.in/";
 
 const api = axios.create({
   baseURL: `${base_url}api/`,
@@ -48,6 +48,15 @@ export const apis = {
   bookAppointment: "appointments",
   appointmentHistory: "appointments/history",
   appointmentDetail: "appointments",
+
+  // ---------------------------------------
+  addAddress: "addresses",
+  getAddress: "addresses",
+  updateAddress: "addresses",
+  getLabTestOrders: "lab-test-orders",
+  getLabTestOrderDetail: "lab-test-orders",
+  createSupportTicket: "support",
+  getSupportTickets: "support",
 };
 
 export default api;

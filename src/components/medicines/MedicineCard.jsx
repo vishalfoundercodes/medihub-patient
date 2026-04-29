@@ -1,8 +1,10 @@
 import { Heart, ShoppingCart, Plus, Minus } from 'lucide-react';
 import { useWishlist } from '../../context/WishlistContext';
+import { useAuth } from '../../context/AuthContext';
 
 export default function MedicineCard({ medicine, onAdd, onRemove, qty }) {
   const { toggleWishlist, isWishlisted } = useWishlist();
+  const { requireAuth } = useAuth();
   const wished = isWishlisted(medicine.id, 'medicine');
   const saved = medicine.original - medicine.price;
 
@@ -66,7 +68,7 @@ export default function MedicineCard({ medicine, onAdd, onRemove, qty }) {
         {qty > 0 ? (
           <div className="flex items-center justify-between border border-[var(--color-primary)] rounded-xl overflow-hidden">
             <button
-              onClick={() => onRemove(medicine.id)}
+              onClick={() => requireAuth() && onRemove(medicine.id)}
               className="flex-1 py-2.5 flex items-center justify-center text-[var(--color-primary)] hover:bg-blue-50 transition-colors"
             >
               <Minus className="w-4 h-4" />
@@ -75,7 +77,7 @@ export default function MedicineCard({ medicine, onAdd, onRemove, qty }) {
               {qty}
             </span>
             <button
-              onClick={() => onAdd(medicine)}
+              onClick={() => requireAuth() && onAdd(medicine)}
               className="flex-1 py-2.5 flex items-center justify-center text-[var(--color-primary)] hover:bg-blue-50 transition-colors"
             >
               <Plus className="w-4 h-4" />
@@ -83,8 +85,8 @@ export default function MedicineCard({ medicine, onAdd, onRemove, qty }) {
           </div>
         ) : (
           <button
-            onClick={() => onAdd(medicine)}
-            className="w-full flex items-center justify-center gap-2 bg-blue-50 hover:bg-[var(--color-primary)] text-[var(--color-primary)] hover:text-white border border-blue-100 hover:border-[var(--color-primary)] py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
+            onClick={() => requireAuth() && onAdd(medicine)}
+            className="w-full flex items-center cursor-pointer justify-center gap-2 bg-blue-50 hover:bg-[var(--color-primary)] text-[var(--color-primary)] hover:text-white border border-blue-100 hover:border-[var(--color-primary)] py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
           >
             <ShoppingCart className="w-4 h-4" />
             Add to Cart

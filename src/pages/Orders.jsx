@@ -57,9 +57,8 @@ export default function Orders() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!user) { setShowLogin(true); navigate('/'); return; }
     fetchOrders();
-  }, [user]);
+  }, []);
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -96,8 +95,6 @@ export default function Orders() {
       setLoading(false);
     }
   };
-
-  if (!user) return null;
 
   const filtered = useMemo(() => {
     let result = [...orders];

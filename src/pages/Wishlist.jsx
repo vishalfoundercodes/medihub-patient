@@ -9,6 +9,7 @@ import Footer from '../components/Footer';
 import Container from '../components/Container';
 import { useCart } from '../context/CartContext';
 import api, { apis } from '../utlities/api';
+import { useAuth } from '../context/AuthContext';
 
 const TABS = [
   { id: 'all',      label: 'All',       icon: LayoutGrid  },
@@ -25,6 +26,7 @@ const categoryConfig = {
 
 function WishlistCard({ item, onRemove, removing, cart, onAddToCart, onRemoveFromCart }) {
   const navigate = useNavigate();
+   const { requireAuth } = useAuth();
   const cfg = categoryConfig[item.type] || categoryConfig.test;
   const Icon = cfg.icon;
   const medQty = item.type === 'medicine' ? (cart.medicines[item.item_id] || 0) : 0;
@@ -33,8 +35,14 @@ function WishlistCard({ item, onRemove, removing, cart, onAddToCart, onRemoveFro
   return (
     <div className="bg-white rounded-2xl border border-[var(--color-border)] hover:shadow-md transition-all duration-200 overflow-hidden group">
       <div className="relative overflow-hidden bg-[var(--color-bg-section)]">
-        <img src={item.image_url} alt={item.name} className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300" />
-        <span className={`absolute top-3 left-3 flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-lg ${cfg.bg} ${cfg.color}`}>
+        <img
+          src={item.image_url}
+          alt={item.name}
+          className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300"
+        />
+        <span
+          className={`absolute top-3 left-3 flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-lg ${cfg.bg} ${cfg.color}`}
+        >
           <Icon className="w-3 h-3" /> {cfg.label}
         </span>
         <button
@@ -42,18 +50,23 @@ function WishlistCard({ item, onRemove, removing, cart, onAddToCart, onRemoveFro
           disabled={removing === item.id}
           className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-red-50 transition-all"
         >
-          {removing === item.id
-            ? <Loader2 className="w-4 h-4 animate-spin text-red-400" />
-            : <Heart className="w-4 h-4 fill-red-500 text-red-500" />
-          }
+          {removing === item.id ? (
+            <Loader2 className="w-4 h-4 animate-spin text-red-400" />
+          ) : (
+            <Heart className="w-4 h-4 fill-red-500 text-red-500" />
+          )}
         </button>
       </div>
 
       <div className="p-4">
-        <h3 className="font-bold text-[var(--color-text-dark)] mb-1 leading-snug">{item.name}</h3>
+        <h3 className="font-bold text-[var(--color-text-dark)] mb-1 leading-snug">
+          {item.name}
+        </h3>
 
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-xl font-bold text-[var(--color-text-dark)]">₹{Math.round(item.price)}</span>
+          <span className="text-xl font-bold text-[var(--color-text-dark)]">
+            ₹{Math.round(item.price)}
+          </span>
           {item.discount_percent > 0 && (
             <span className="text-xs font-bold text-[var(--color-success)] bg-green-50 px-2 py-0.5 rounded-full">
               {Math.round(item.discount_percent)}% OFF
@@ -61,7 +74,7 @@ function WishlistCard({ item, onRemove, removing, cart, onAddToCart, onRemoveFro
           )}
         </div>
 
-        {item.type === 'doctor' && (
+        {item.type === "doctor" && (
           <button
             onClick={() => navigate(`/book-appointment/${item.item_id}`)}
             className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white transition-all"
@@ -70,44 +83,50 @@ function WishlistCard({ item, onRemove, removing, cart, onAddToCart, onRemoveFro
           </button>
         )}
 
-        {item.type === 'test' && (
-          testAdded ? (
+        {item.type === "test" &&
+          (testAdded ? (
             <button
-              onClick={() => onRemoveFromCart('test', item)}
+              onClick={() => onRemoveFromCart("test", item)}
               className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold bg-[var(--color-success)] hover:bg-green-600 text-white transition-all"
             >
               <CheckCircle className="w-4 h-4" /> Added
             </button>
           ) : (
             <button
-              onClick={() => onAddToCart('test', item)}
-              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold bg-blue-50 hover:bg-[var(--color-primary)] text-[var(--color-primary)] hover:text-white border border-blue-100 hover:border-[var(--color-primary)] transition-all"
+              onClick={() => requireAuth() && onAddToCart("test", item)}
+              className="w-full flex items-center cursor-pointer justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold bg-blue-50 hover:bg-[var(--color-primary)] text-[var(--color-primary)] hover:text-white border border-blue-100 hover:border-[var(--color-primary)] transition-all"
             >
               <ShoppingCart className="w-4 h-4" /> Add to Cart
             </button>
-          )
-        )}
+          ))}
 
-        {item.type === 'medicine' && (
-          medQty > 0 ? (
+        {item.type === "medicine" &&
+          (medQty > 0 ? (
             <div className="flex items-center justify-between border border-[var(--color-primary)] rounded-xl overflow-hidden">
-              <button onClick={() => onRemoveFromCart('medicine', item)} className="flex-1 py-2.5 flex items-center justify-center text-[var(--color-primary)] hover:bg-blue-50">
+              <button
+                onClick={() => onRemoveFromCart("medicine", item)}
+                className="flex-1 py-2.5 flex items-center justify-center text-[var(--color-primary)] hover:bg-blue-50"
+              >
                 <Minus className="w-4 h-4" />
               </button>
-              <span className="font-bold text-[var(--color-text-dark)] px-4">{medQty}</span>
-              <button onClick={() => onAddToCart('medicine', item)} className="flex-1 py-2.5 flex items-center justify-center text-[var(--color-primary)] hover:bg-blue-50">
+              <span className="font-bold text-[var(--color-text-dark)] px-4">
+                {medQty}
+              </span>
+              <button
+                onClick={() => onAddToCart("medicine", item)}
+                className="flex-1 py-2.5 flex items-center justify-center text-[var(--color-primary)] hover:bg-blue-50"
+              >
                 <Plus className="w-4 h-4" />
               </button>
             </div>
           ) : (
             <button
-              onClick={() => onAddToCart('medicine', item)}
-              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold bg-blue-50 hover:bg-[var(--color-primary)] text-[var(--color-primary)] hover:text-white border border-blue-100 hover:border-[var(--color-primary)] transition-all"
+              onClick={() => requireAuth() && onAddToCart("medicine", item)}
+              className="w-full flex items-center cursor-pointer justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold bg-blue-50 hover:bg-[var(--color-primary)] text-[var(--color-primary)] hover:text-white border border-blue-100 hover:border-[var(--color-primary)] transition-all"
             >
               <ShoppingCart className="w-4 h-4" /> Add to Cart
             </button>
-          )
-        )}
+          ))}
       </div>
     </div>
   );

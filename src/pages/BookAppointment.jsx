@@ -9,6 +9,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Container from '../components/Container';
 import api, { apis } from '../utlities/api';
+import { useAuth } from '../context/AuthContext';
 
 const WEEKDAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
@@ -57,6 +58,7 @@ const CONSULTATION_TYPES = [
 export default function BookAppointment() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { requireAuth } = useAuth();
 
   const [doctor, setDoctor] = useState(null);
   const [doctorLoading, setDoctorLoading] = useState(true);
@@ -661,7 +663,7 @@ export default function BookAppointment() {
                 <p className="text-red-500 text-xs text-center mb-3">{errors.submit}</p>
               )}
               <button
-                onClick={handleSubmit}
+                onClick={() => requireAuth() && handleSubmit()}
                 disabled={loading}
                 className="w-full bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] disabled:opacity-60 text-white font-bold py-4 rounded-xl cursor-pointer flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-100 text-sm"
               >

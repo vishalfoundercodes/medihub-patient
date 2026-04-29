@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { CartProvider } from './context/CartContext';
+import ProtectedRoute from './components/ProtectedRoute';
 import Wishlist from './pages/Wishlist';
 import Home from './pages/Home';
 import LabTests from './pages/LabTests';
@@ -12,6 +13,7 @@ import Account from './pages/Account';
 import Orders from './pages/Orders';
 import MyLabTests from './pages/MyLabTests';
 import LabTestDetail from './pages/LabTestDetail';
+import LabTestOrderDetail from './pages/LabTestOrderDetail';
 import Appointments from './pages/Appointments';
 import AppointmentDetail from './pages/AppointmentDetail';
 import Notifications from './pages/Notifications';
@@ -39,25 +41,27 @@ function AppContent() {
         <Route path="/medicines" element={<Medicines />} />
         <Route path="/doctors" element={<Doctors />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/account" element={<Account />} />
-        <Route path="/orders" element={<Orders />} />
-        <Route path="/my-lab-tests" element={<MyLabTests />} />
-        <Route path="/lab-test/:id" element={<LabTestDetail />} />
-        <Route path="/appointments" element={<Appointments />} />
-        <Route path="/appointment/:id" element={<AppointmentDetail />} />
-        <Route path="/notifications" element={<Notifications />} />
-        <Route path="/help-support" element={<HelpSupport />} />
-        <Route path="/lab-checkout" element={<LabCheckout />} />
-        <Route path="/book-appointment/:id" element={<BookAppointment />} />
-        <Route path="/medicine-cart" element={<MedicineCart />} />
+        <Route path="/search" element={<Search />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsConditions />} />
         <Route path="/cancellation" element={<CancellationPolicy />} />
-        <Route path="/search" element={<Search />} />
-        <Route path="/my-addresses" element={<MyAddresses />} />
-        <Route path="/order/:id" element={<OrderDetail />} />
-        <Route path="/search" element={<Search />} />
-        <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/lab-test/:id" element={<LabTestDetail />} />
+        <Route path="/book-appointment/:id" element={<BookAppointment />} />
+
+        {/* Protected Routes */}
+        <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
+        <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+        <Route path="/order/:id" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
+        <Route path="/my-lab-tests" element={<ProtectedRoute><MyLabTests /></ProtectedRoute>} />
+        <Route path="/my-lab-test/:id" element={<ProtectedRoute><LabTestOrderDetail /></ProtectedRoute>} />
+        <Route path="/appointments" element={<ProtectedRoute><Appointments /></ProtectedRoute>} />
+        <Route path="/appointment/:id" element={<ProtectedRoute><AppointmentDetail /></ProtectedRoute>} />
+        <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+        <Route path="/help-support" element={<ProtectedRoute><HelpSupport /></ProtectedRoute>} />
+        <Route path="/lab-checkout" element={<ProtectedRoute><LabCheckout /></ProtectedRoute>} />
+        <Route path="/medicine-cart" element={<ProtectedRoute><MedicineCart /></ProtectedRoute>} />
+        <Route path="/my-addresses" element={<ProtectedRoute><MyAddresses /></ProtectedRoute>} />
+        <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
       </Routes>
     </>
   );

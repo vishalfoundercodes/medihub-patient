@@ -10,6 +10,7 @@ import CartBar from '../components/lab/CartBar';
 import Container from '../components/Container';
 import api, { apis } from '../utlities/api';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 const defaultFilters = {
   categoryId: null,
@@ -32,6 +33,7 @@ export default function LabTests() {
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const { addToCart, getQty, apiCart, fetchCart } = useCart();
+   const { requireAuth } = useAuth();
 
   const [categories, setCategories] = useState([]);
   const [tests, setTests] = useState([]);
@@ -192,23 +194,38 @@ export default function LabTests() {
                     <div
                       key={test.id}
                       className={`bg-white rounded-2xl border overflow-hidden transition-all duration-200 hover:shadow-lg
-                        ${isSelected ? 'border-[var(--color-primary)] shadow-md shadow-blue-100' : 'border-[var(--color-border)] hover:border-blue-200'}`}
+                        ${isSelected ? "border-[var(--color-primary)] shadow-md shadow-blue-100" : "border-[var(--color-border)] hover:border-blue-200"}`}
                     >
                       <div className="relative overflow-hidden">
-                        <img src={test.image_url} alt={test.name} className="w-full h-32 object-cover" />
+                        <img
+                          src={test.image_url}
+                          alt={test.name}
+                          className="w-full h-32 object-cover"
+                        />
                         <span className="absolute top-3 left-3 bg-red-100 text-red-800 text-xs font-bold px-2.5 py-1 rounded-lg">
                           {Math.round(test.discount_percent)}% OFF
                         </span>
                       </div>
                       <div className="p-4">
-                        <h3 className="font-bold text-[var(--color-text-dark)] mb-1 text-sm leading-snug">{test.name}</h3>
-                        <p className="text-xs text-[var(--color-text-secondary)] mb-2">{test.report_time}</p>
+                        <h3 className="font-bold text-[var(--color-text-dark)] mb-1 text-sm leading-snug">
+                          {test.name}
+                        </h3>
+                        <p className="text-xs text-[var(--color-text-secondary)] mb-2">
+                          {test.report_time}
+                        </p>
                         <div className="flex items-center justify-between gap-2 mb-1">
                           <div>
-                            <span className="text-xl font-bold text-[var(--color-text-dark)]">₹{Math.round(test.discounted_price)}</span>
-                            <span className="text-sm text-[var(--color-text-secondary)] line-through ml-1">₹{Math.round(test.price)}</span>
+                            <span className="text-xl font-bold text-[var(--color-text-dark)]">
+                              ₹{Math.round(test.discounted_price)}
+                            </span>
+                            <span className="text-sm text-[var(--color-text-secondary)] line-through ml-1">
+                              ₹{Math.round(test.price)}
+                            </span>
                           </div>
-                          <p className="text-xs font-semibold text-[var(--color-success)]">Save ₹{Math.round(test.price - test.discounted_price)}</p>
+                          <p className="text-xs font-semibold text-[var(--color-success)]">
+                            Save ₹
+                            {Math.round(test.price - test.discounted_price)}
+                          </p>
                         </div>
                         {test.home_collection === 1 && (
                           <div className="flex items-center gap-1.5 text-xs text-[var(--color-primary)] bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-lg w-fit mb-3">
@@ -216,11 +233,11 @@ export default function LabTests() {
                           </div>
                         )}
                         <button
-                          onClick={() => handleAdd(test)}
-                          className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all
-                            ${isSelected ? 'bg-[var(--color-success)] text-white hover:bg-green-600' : 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-dark)]'}`}
+                          onClick={() => requireAuth() && handleAdd(test)}
+                          className={`w-full py-2.5 cursor-pointer rounded-xl text-sm font-semibold transition-all
+                            ${isSelected ? "bg-[var(--color-success)] text-white hover:bg-green-600" : "bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-dark)]"}`}
                         >
-                          {isSelected ? '✓ Added' : 'Book Now'}
+                          {isSelected ? "✓ Added" : "Book Now"}
                         </button>
                       </div>
                     </div>

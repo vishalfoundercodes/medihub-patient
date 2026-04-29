@@ -1,9 +1,11 @@
 import { Heart, Star, Video, Building2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useWishlist } from '../../context/WishlistContext';
+import { useAuth } from '../../context/AuthContext';
 
 export default function DoctorCard({ doctor }) {
   const { toggleWishlist, isWishlisted } = useWishlist();
+  const { requireAuth } = useAuth();
   const wished = isWishlisted(doctor.id, 'doctor');
   const navigate = useNavigate();
 
@@ -72,8 +74,8 @@ export default function DoctorCard({ doctor }) {
 
         {/* Book Appointment */}
         <button
-          onClick={() => navigate(`/book-appointment/${doctor.id}`)}
-          className="w-full bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] cursor-pointer text-white py-2.5 rounded-xl text-sm font-semibold transition-all">
+          onClick={() =>{console.log("button clicked"), requireAuth() && navigate(`/book-appointment/${doctor.id}`)}}
+          className="w-full  bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] cursor-pointer text-white py-2.5 rounded-xl text-sm font-semibold transition-all">
           Book Appointment
         </button>
       </div>

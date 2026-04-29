@@ -95,9 +95,8 @@ export default function OrderDetail() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!user) { setShowLogin(true); navigate('/'); return; }
     fetchOrderDetail();
-  }, [user]);
+  }, []);
 
   const fetchOrderDetail = async () => {
     setLoading(true);
@@ -119,9 +118,7 @@ export default function OrderDetail() {
     }
   };
 
-  if (!user) return null;
-
-  // ── Loading ──
+  // Loading state
   if (loading) {
     return (
       <div className="min-h-screen bg-[var(--color-bg-main)]">
@@ -135,7 +132,7 @@ export default function OrderDetail() {
     );
   }
 
-  // ── Error ──
+  // Error state
   if (error || !order) {
     return (
       <div className="min-h-screen bg-[var(--color-bg-main)]">

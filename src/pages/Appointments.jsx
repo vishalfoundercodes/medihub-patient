@@ -28,7 +28,6 @@ export default function Appointments() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) { setShowLogin(true); navigate('/'); return; }
     const fetch = async () => {
       try {
         const res = await api.get(apis.appointmentHistory);

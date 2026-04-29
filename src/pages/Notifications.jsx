@@ -22,12 +22,6 @@ export default function Notifications() {
   const [page, setPage] = useState(1);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-  useEffect(() => {
-    if (!user) { setShowLogin(true); navigate('/'); }
-  }, [user]);
-
-  if (!user) return null;
-
   const handleRead = (id) => {
     setNotifications((prev) =>
       prev.map((n) => n.id === id ? { ...n, read: true } : n)

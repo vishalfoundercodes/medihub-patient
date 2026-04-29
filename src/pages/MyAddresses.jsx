@@ -1,43 +1,41 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Plus, Pencil, Trash2, Home, Briefcase, CheckCircle, X, Save } from 'lucide-react';
+import { MapPin, Plus, Pencil, Trash2, Home, Briefcase, CheckCircle, X, Save, Loader2, CheckCircle2 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Container from '../components/Container';
 import AccountSidebar from '../components/account/AccountSidebar';
 import { useAuth } from '../context/AuthContext';
-
-const DEFAULT_ADDRESSES = [
-  {
-    id: 1, label: 'Home', icon: 'home',
-    name: 'Rahul Kumar', phone: '+91 98765 43210',
-    line1: 'A-45, 2nd Floor, Green Park Extension',
-    city: 'New Delhi', state: 'Delhi', pincode: '110016',
-    default: true,
-  },
-  {
-    id: 2, label: 'Office', icon: 'office',
-    name: 'Rahul Kumar', phone: '+91 98765 43210',
-    line1: 'B-12, Connaught Place',
-    city: 'New Delhi', state: 'Delhi', pincode: '110001',
-    default: false,
-  },
-];
+import api, { apis } from '../utlities/api';
 
 const EMPTY_FORM = { label: 'Home', name: '', phone: '', line1: '', city: '', state: '', pincode: '' };
 
 export default function MyAddresses() {
   const { user, setShowLogin } = useAuth();
   const navigate = useNavigate();
-  const [addresses, setAddresses] = useState(DEFAULT_ADDRESSES);
+  const [addresses, setAddresses] = useState([]);
+  const [pageLoading, setPageLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [errors, setErrors] = useState({});
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
-    if (!user) { setShowLogin(true); navigate('/'); }
-  }, [user]);
+    fetchAddresses();
+  }, []);
+
+  const fetchAddresses = async () => {
+    try {
+      const res = await api.get(apis.getAddress);
+      if (res.data.success) setAddresses(res.data.data.addresses);
+    } catch (err) {
+      console.error('Failed to fetch addresses:', err);
+    } finally {
+      setPageLoading(false);
+    }
+  };
 
   if (!user) return null;
 
@@ -58,30 +56,83 @@ export default function MyAddresses() {
     return Object.keys(e).length === 0;
   };
 
-  const handleSave = () => {
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const handleSave = async () => {
     if (!validate()) return;
-    if (editId) {
-      setAddresses((p) => p.map((a) => a.id === editId ? { ...a, ...form } : a));
-    } else {
-      setAddresses((p) => [...p, { ...form, id: Date.now(), default: p.length === 0 }]);
+    setSaving(true);
+    const body = {
+      name: form.name,
+      mobile: form.phone,
+      address_line: form.line1,
+      city: form.city,
+      state: form.state,
+      pincode: form.pincode,
+      label: form.label.toLowerCase(),
+      is_default: editId ? (addresses.find((a) => a.id === editId)?.is_default ?? 0) : (addresses.length === 0 ? 1 : 0),
+    };
+    try {
+      if (editId) {
+        const res = await api.put(`${apis.editAddress}/${editId}`, body);
+        showToast(res.data.data.message);
+      } else {
+        await api.post(apis.addAddress, body);
+        showToast('Address added successfully!');
+      }
+      await fetchAddresses();
+      handleCancel();
+    } catch (err) {
+      setErrors((p) => ({ ...p, submit: err?.response?.data?.message || 'Failed to save address.' }));
+    } finally {
+      setSaving(false);
     }
-    setShowForm(false);
-    setEditId(null);
-    setForm(EMPTY_FORM);
   };
 
   const handleEdit = (addr) => {
-    setForm({ label: addr.label, name: addr.name, phone: addr.phone, line1: addr.line1, city: addr.city, state: addr.state, pincode: addr.pincode });
+    setForm({
+      label: addr.label.charAt(0).toUpperCase() + addr.label.slice(1),
+      name: addr.name,
+      phone: addr.mobile,
+      line1: addr.address_line,
+      city: addr.city,
+      state: addr.state,
+      pincode: addr.pincode,
+    });
     setEditId(addr.id);
     setShowForm(true);
   };
 
-  const handleDelete = (id) => {
-    setAddresses((p) => p.filter((a) => a.id !== id));
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`${apis.updateAddress}/${id}`);
+      setAddresses((p) => p.filter((a) => a.id !== id));
+      showToast(res.data.data.message);
+      await fetchAddresses();
+    } catch (err) {
+      console.error('Delete failed:', err);
+    }
   };
 
-  const handleSetDefault = (id) => {
-    setAddresses((p) => p.map((a) => ({ ...a, default: a.id === id })));
+  const handleSetDefault = async (addr) => {
+    try {
+      const res = await api.put(`${apis.updateAddress}/${addr.id}`, {
+        name: addr.name,
+        mobile: addr.mobile,
+        address_line: addr.address_line,
+        city: addr.city,
+        state: addr.state,
+        pincode: addr.pincode,
+        label: addr.label,
+        is_default: 1,
+      });
+      showToast(res.data.data.message);
+      await fetchAddresses();
+    } catch (err) {
+      console.error('Set default failed:', err);
+    }
   };
 
   const handleCancel = () => {
@@ -94,6 +145,14 @@ export default function MyAddresses() {
   return (
     <div className="min-h-screen bg-[var(--color-bg-main)]">
       <Navbar />
+
+      {/* Toast */}
+      {toast && (
+        <div className="fixed top-5 right-5 z-50 flex items-center gap-3 bg-white border border-green-200 shadow-xl rounded-2xl px-5 py-3.5 animate-fade-in">
+          <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
+          <p className="text-sm font-semibold text-[var(--color-text-dark)]">{toast}</p>
+        </div>
+      )}
       <Container className="py-8">
         <div className="flex gap-7 items-start">
 
@@ -177,39 +236,46 @@ export default function MyAddresses() {
                 <div className="flex gap-3 mt-5">
                   <button
                     onClick={handleSave}
-                    className="flex items-center gap-2 bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white font-semibold px-6 py-3 rounded-xl text-sm transition-all"
+                    disabled={saving}
+                    className="flex items-center gap-2 bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] disabled:opacity-60 text-white font-semibold px-6 py-3 rounded-xl text-sm transition-all"
                   >
-                    <Save className="w-4 h-4" /> {editId ? 'Update Address' : 'Save Address'}
+                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                    {editId ? 'Update Address' : 'Save Address'}
                   </button>
                   <button onClick={handleCancel} className="border border-[var(--color-border)] text-[var(--color-text-secondary)] font-semibold px-6 py-3 rounded-xl text-sm hover:bg-gray-50 transition-all">
                     Cancel
                   </button>
                 </div>
+                {errors.submit && <p className="text-red-500 text-xs mt-2">{errors.submit}</p>}
               </div>
             )}
 
             {/* Address list */}
-            {addresses.length > 0 ? (
+            {pageLoading ? (
+              <div className="flex justify-center py-16">
+                <Loader2 className="w-8 h-8 animate-spin text-[var(--color-primary)]" />
+              </div>
+            ) : addresses.length > 0 ? (
               <div className="grid md:grid-cols-2 gap-5">
                 {addresses.map((addr) => (
                   <div
                     key={addr.id}
-                    className={`bg-white rounded-2xl border p-5 transition-all ${addr.default ? 'border-[var(--color-primary)] shadow-md shadow-blue-50' : 'border-[var(--color-border)] hover:border-blue-200 hover:shadow-sm'}`}
+                    className={`bg-white rounded-2xl border p-5 transition-all ${addr.is_default ? 'border-[var(--color-primary)] shadow-md shadow-blue-50' : 'border-[var(--color-border)] hover:border-blue-200 hover:shadow-sm'}`}
                   >
                     {/* Top row */}
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${addr.default ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-bg-section)]'}`}>
-                          {addr.label === 'Home'
-                            ? <Home className={`w-4 h-4 ${addr.default ? 'text-white' : 'text-[var(--color-text-secondary)]'}`} />
-                            : addr.label === 'Office'
-                              ? <Briefcase className={`w-4 h-4 ${addr.default ? 'text-white' : 'text-[var(--color-text-secondary)]'}`} />
-                              : <MapPin className={`w-4 h-4 ${addr.default ? 'text-white' : 'text-[var(--color-text-secondary)]'}`} />
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${addr.is_default ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-bg-section)]'}`}>
+                          {addr.label === 'home'
+                            ? <Home className={`w-4 h-4 ${addr.is_default ? 'text-white' : 'text-[var(--color-text-secondary)]'}`} />
+                            : addr.label === 'office'
+                              ? <Briefcase className={`w-4 h-4 ${addr.is_default ? 'text-white' : 'text-[var(--color-text-secondary)]'}`} />
+                              : <MapPin className={`w-4 h-4 ${addr.is_default ? 'text-white' : 'text-[var(--color-text-secondary)]'}`} />
                           }
                         </div>
                         <div>
-                          <p className="font-bold text-sm text-[var(--color-text-dark)]">{addr.label}</p>
-                          {addr.default && (
+                          <p className="font-bold text-sm text-[var(--color-text-dark)] capitalize">{addr.label}</p>
+                          {addr.is_default === 1 && (
                             <span className="text-[10px] font-bold text-[var(--color-primary)] bg-blue-50 px-2 py-0.5 rounded-full">Default</span>
                           )}
                         </div>
@@ -226,15 +292,15 @@ export default function MyAddresses() {
 
                     {/* Address details */}
                     <p className="text-sm font-semibold text-[var(--color-text-dark)] mb-0.5">{addr.name}</p>
-                    <p className="text-xs text-[var(--color-text-secondary)] mb-0.5">{addr.phone}</p>
+                    <p className="text-xs text-[var(--color-text-secondary)] mb-0.5">{addr.mobile}</p>
                     <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
-                      {addr.line1}, {addr.city}, {addr.state} - {addr.pincode}
+                      {addr.address_line}, {addr.city}, {addr.state} - {addr.pincode}
                     </p>
 
                     {/* Set default */}
-                    {!addr.default && (
+                    {addr.is_default !== 1 && (
                       <button
-                        onClick={() => handleSetDefault(addr.id)}
+                        onClick={() => handleSetDefault(addr)}
                         className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-[var(--color-primary)] hover:underline"
                       >
                         <CheckCircle className="w-3.5 h-3.5" /> Set as Default

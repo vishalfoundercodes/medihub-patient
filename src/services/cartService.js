@@ -38,10 +38,11 @@ export const getCartAPI = async () => {
  * Fields: address_id, note, prescription (file, optional — only for medicine)
  * Auth: Bearer token auto-injected
  */
-export const placeOrderAPI = async ({ address_id, note = '', prescription = null, lab_test_slot_id = null, lab_test_booking_date = null }) => {
+export const placeOrderAPI = async ({ address_id, note = '', prescription = null, lab_test_slot_id = null, lab_test_booking_date = null, type = 'medicine' }) => {
   const formData = new FormData();
   formData.append('address_id', address_id);
   formData.append('note', note);
+  formData.append('type', type);
   if (prescription) formData.append('prescriptions', prescription);
   if (lab_test_slot_id) formData.append('lab_test_slot_id', lab_test_slot_id);
   if (lab_test_booking_date) formData.append('lab_test_booking_date', lab_test_booking_date);

@@ -22,12 +22,6 @@ export default function LabTestDetail() {
   const [activeTab, setActiveTab] = useState('Overview');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-  useEffect(() => {
-    if (!user) { setShowLogin(true); navigate('/'); }
-  }, [user]);
-
-  if (!user) return null;
-
   const test = LAB_TEST_DETAIL;
 
   const renderTabContent = () => {

@@ -9,6 +9,7 @@ import DoctorFilters from '../components/doctors/DoctorFilters';
 import DoctorTrustBar from '../components/doctors/DoctorTrustBar';
 import Container from '../components/Container';
 import api, { apis } from '../utlities/api';
+import { useAuth } from '../context/AuthContext';
 
 const defaultFilters = {
   consultancyType: 'all',
@@ -33,6 +34,7 @@ export default function Doctors() {
   const [filters, setFilters] = useState(defaultFilters);
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+   const { requireAuth } = useAuth();
 
   const [specializations, setSpecializations] = useState([]);
   const [doctors, setDoctors] = useState([]);
@@ -249,9 +251,10 @@ export default function Doctors() {
                       )}
                       <button
                         onClick={() =>
+                          requireAuth() &&
                           navigate(`/book-appointment/${doctor.id}`)
                         }
-                        className="w-full bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white py-2.5 rounded-xl text-sm font-semibold transition-all"
+                        className="w-full cursor-pointer bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white py-2.5 rounded-xl text-sm font-semibold transition-all"
                       >
                         Book Appointment
                       </button>

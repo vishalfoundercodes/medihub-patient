@@ -1,17 +1,16 @@
 import { useState } from 'react';
-import { User, FileText, Image, Send, X, Loader2 } from 'lucide-react';
-import { ISSUE_CATEGORIES } from '../../data/supportData';
+import { FileText, Image, Send, X, Loader2 } from 'lucide-react';
+import api, { apis } from '../../utlities/api';
 
-export default function CreateTicketForm({ onSubmit }) {
-  const [form, setForm] = useState({ name: '', issue: '', description: '', image: null });
+export default function CreateTicketForm({ onSuccess }) {
+  const [form, setForm] = useState({ title: '', description: '', image: null });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState(null);
 
   const validate = () => {
     const e = {};
-    if (!form.name.trim()) e.name = 'Name is required';
-    if (!form.issue) e.issue = 'Please select an issue category';
+    if (!form.title.trim()) e.title = 'Title is required';
     if (!form.description.trim()) e.description = 'Description is required';
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -25,20 +24,32 @@ export default function CreateTicketForm({ onSubmit }) {
     }
   };
 
-  const handleRemoveImage = () => {
-    setForm((p) => ({ ...p, image: null }));
-    setPreview(null);
-  };
-
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validate()) return;
     setLoading(true);
-    setTimeout(() => {
-      onSubmit(form);
-      setForm({ name: '', issue: '', description: '', image: null });
-      setPreview(null);
+    try {
+      const formData = new FormData();
+      formData.append('title', form.title);
+      formData.append('description', form.description);
+      if (form.image) formData.append('image', form.image);
+
+      const res = await api.post(apis.createSupportTicket, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      if (res.data.success) {
+        setForm({ title: '', description: '', image: null });
+        setPreview(null);
+        setErrors({});
+        onSuccess(res.data.message || 'Ticket created successfully!');
+      } else {
+        setErrors((p) => ({ ...p, submit: res.data.message || 'Failed to create ticket.' }));
+      }
+    } catch (err) {
+      setErrors((p) => ({ ...p, submit: err?.response?.data?.message || 'Network error. Please try again.' }));
+    } finally {
       setLoading(false);
-    }, 1200);
+    }
   };
 
   return (
@@ -46,41 +57,25 @@ export default function CreateTicketForm({ onSubmit }) {
       <h3 className="font-bold text-[var(--color-text-dark)] mb-5">Create Support Ticket</h3>
       <div className="space-y-4">
 
-        {/* Name */}
+        {/* Title */}
         <div>
-          <label className="text-sm font-semibold text-[var(--color-text-dark)] mb-2 block">Your Name</label>
+          <label className="text-sm font-semibold text-[var(--color-text-dark)] mb-2 block">Title *</label>
           <div className="relative">
-            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-secondary)]" />
+            <FileText className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-secondary)]" />
             <input
               type="text"
-              value={form.name}
-              onChange={(e) => { setForm((p) => ({ ...p, name: e.target.value })); setErrors((p) => ({ ...p, name: '' })); }}
-              placeholder="Enter your name"
-              className={`w-full pl-10 pr-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] ${errors.name ? 'border-red-400' : 'border-[var(--color-border)]'}`}
+              value={form.title}
+              onChange={(e) => { setForm((p) => ({ ...p, title: e.target.value })); setErrors((p) => ({ ...p, title: '' })); }}
+              placeholder="Enter ticket title"
+              className={`w-full pl-10 pr-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] ${errors.title ? 'border-red-400' : 'border-[var(--color-border)]'}`}
             />
           </div>
-          {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
-        </div>
-
-        {/* Issue Category */}
-        <div>
-          <label className="text-sm font-semibold text-[var(--color-text-dark)] mb-2 block">Issue Category</label>
-          <select
-            value={form.issue}
-            onChange={(e) => { setForm((p) => ({ ...p, issue: e.target.value })); setErrors((p) => ({ ...p, issue: '' })); }}
-            className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] ${errors.issue ? 'border-red-400' : 'border-[var(--color-border)]'}`}
-          >
-            <option value="">Select issue category</option>
-            {ISSUE_CATEGORIES.map((cat) => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
-          </select>
-          {errors.issue && <p className="text-red-500 text-xs mt-1">{errors.issue}</p>}
+          {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title}</p>}
         </div>
 
         {/* Description */}
         <div>
-          <label className="text-sm font-semibold text-[var(--color-text-dark)] mb-2 block">Issue Description</label>
+          <label className="text-sm font-semibold text-[var(--color-text-dark)] mb-2 block">Description *</label>
           <textarea
             value={form.description}
             onChange={(e) => { setForm((p) => ({ ...p, description: e.target.value })); setErrors((p) => ({ ...p, description: '' })); }}
@@ -104,22 +99,20 @@ export default function CreateTicketForm({ onSubmit }) {
           ) : (
             <div className="relative border border-[var(--color-border)] rounded-xl overflow-hidden">
               <img src={preview} alt="Preview" className="w-full h-48 object-cover" />
-              <button
-                onClick={handleRemoveImage}
-                className="absolute top-2 right-2 w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-all"
-              >
+              <button onClick={() => { setForm((p) => ({ ...p, image: null })); setPreview(null); }}
+                className="absolute top-2 right-2 w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center">
                 <X className="w-4 h-4" />
               </button>
             </div>
           )}
         </div>
 
-        {/* Submit */}
-        <button
-          onClick={handleSubmit}
-          disabled={loading}
-          className="w-full bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] disabled:opacity-60 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md shadow-blue-100"
-        >
+        {errors.submit && (
+          <p className="text-red-500 text-xs bg-red-50 border border-red-100 rounded-xl px-3 py-2">{errors.submit}</p>
+        )}
+
+        <button onClick={handleSubmit} disabled={loading}
+          className="w-full bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] disabled:opacity-60 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md shadow-blue-100">
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           {loading ? 'Creating Ticket...' : 'Create Ticket'}
         </button>

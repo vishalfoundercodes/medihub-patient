@@ -1,8 +1,10 @@
 import { Heart, Home } from 'lucide-react';
 import { useWishlist } from '../../context/WishlistContext';
+import { useAuth } from '../../context/AuthContext';
 
 export default function LabTestCard({ test, onAdd, isSelected }) {
   const { toggleWishlist, isWishlisted } = useWishlist();
+  const { requireAuth } = useAuth();
   const wished = isWishlisted(test.id, 'test');
   const saved = test.original - test.price;
 
@@ -77,7 +79,7 @@ export default function LabTestCard({ test, onAdd, isSelected }) {
 
         {/* Book Now */}
         <button
-          onClick={() => onAdd(test)}
+          onClick={() => requireAuth() && onAdd(test)}
           className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all
             ${
               isSelected

@@ -106,14 +106,13 @@ export default function LabCheckout() {
     setLoading(true);
     setOrderError('');
     try {
-      console.log('[LabCheckout] Placing order:', { address_id: form.addressId, note, lab_test_slot_id: selectedSlotId });
       const res = await placeOrderAPI({
         address_id: form.addressId,
         note,
         lab_test_slot_id: selectedSlotId,
-        lab_test_booking_date:form.date,
+        lab_test_booking_date: form.date,
+        type: 'lab_test',
       });
-      console.log('[LabCheckout] Order response:', res);
       if (res.success) {
         setSuccess(true);
       } else {

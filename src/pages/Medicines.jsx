@@ -10,6 +10,7 @@ import MedicineTrustBar from '../components/medicines/MedicineTrustBar';
 import Container from '../components/Container';
 import api, { apis } from '../utlities/api';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 const defaultFilters = {
   categoryId: null,
@@ -35,6 +36,7 @@ export default function Medicines() {
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   // cart state is managed globally via CartContext
+   const { requireAuth } = useAuth();
 
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
@@ -200,42 +202,73 @@ export default function Medicines() {
                   const qty = getQty(med.id);
                   const saved = Math.round(med.price - med.discounted_price);
                   return (
-                    <div key={med.id} className="bg-white rounded-2xl border border-[var(--color-border)] hover:border-blue-200 hover:shadow-lg transition-all duration-200 overflow-hidden">
+                    <div
+                      key={med.id}
+                      className="bg-white rounded-2xl border border-[var(--color-border)] hover:border-blue-200 hover:shadow-lg transition-all duration-200 overflow-hidden"
+                    >
                       <div className="relative bg-[var(--color-bg-section)] overflow-hidden">
-                        <img src={med.image_url} alt={med.name} className="w-full h-32 object-cover" />
+                        <img
+                          src={med.image_url}
+                          alt={med.name}
+                          className="w-full h-32 object-cover"
+                        />
                         {med.discount_percent > 0 && (
                           <span className="absolute top-3 left-3 bg-red-100 text-red-800 text-xs font-bold px-2.5 py-1 rounded-lg">
                             {Math.round(med.discount_percent)}% OFF
                           </span>
                         )}
                         {med.requires_prescription === 1 && (
-                          <span className="absolute top-3 right-3 bg-orange-100 text-orange-700 text-[10px] font-bold px-2 py-0.5 rounded-lg">Rx</span>
+                          <span className="absolute top-3 right-3 bg-orange-100 text-orange-700 text-[10px] font-bold px-2 py-0.5 rounded-lg">
+                            Rx
+                          </span>
                         )}
                       </div>
                       <div className="p-4">
-                        <h3 className="font-bold text-[var(--color-text-dark)] text-sm leading-snug mb-0.5">{med.name}</h3>
-                        <p className="text-xs text-[var(--color-text-secondary)] mb-3">{med.brand} • {med.category_name}</p>
+                        <h3 className="font-bold text-[var(--color-text-dark)] text-sm leading-snug mb-0.5">
+                          {med.name}
+                        </h3>
+                        <p className="text-xs text-[var(--color-text-secondary)] mb-3">
+                          {med.brand} • {med.category_name}
+                        </p>
                         <div className="flex items-center justify-between gap-2 mb-0.5">
                           <div>
-                            <span className="text-xl font-bold text-[var(--color-text-dark)]">₹{Math.round(med.discounted_price)}</span>
-                            {saved > 0 && <span className="text-sm text-[var(--color-text-secondary)] line-through ml-1">₹{Math.round(med.price)}</span>}
+                            <span className="text-xl font-bold text-[var(--color-text-dark)]">
+                              ₹{Math.round(med.discounted_price)}
+                            </span>
+                            {saved > 0 && (
+                              <span className="text-sm text-[var(--color-text-secondary)] line-through ml-1">
+                                ₹{Math.round(med.price)}
+                              </span>
+                            )}
                           </div>
-                          {saved > 0 && <p className="text-xs font-semibold text-[var(--color-success)]">Save ₹{saved}</p>}
+                          {saved > 0 && (
+                            <p className="text-xs font-semibold text-[var(--color-success)]">
+                              Save ₹{saved}
+                            </p>
+                          )}
                         </div>
                         {qty > 0 ? (
                           <div className="flex items-center justify-between border border-[var(--color-primary)] rounded-xl overflow-hidden mt-3">
-                            <button onClick={() => removeFromCart(med.id)} className="flex-1 py-2.5 flex items-center justify-center text-[var(--color-primary)] hover:bg-blue-50 transition-colors">
+                            <button
+                              onClick={() => removeFromCart(med.id)}
+                              className="flex-1 py-2.5 flex items-center justify-center text-[var(--color-primary)] hover:bg-blue-50 transition-colors"
+                            >
                               <Minus className="w-4 h-4" />
                             </button>
-                            <span className="font-bold text-[var(--color-text-dark)] px-4">{qty}</span>
-                            <button onClick={() => addToCart(med)} className="flex-1 py-2.5 flex items-center justify-center text-[var(--color-primary)] hover:bg-blue-50 transition-colors">
+                            <span className="font-bold text-[var(--color-text-dark)] px-4">
+                              {qty}
+                            </span>
+                            <button
+                              onClick={() => addToCart(med)}
+                              className="flex-1 py-2.5 flex items-center justify-center text-[var(--color-primary)] hover:bg-blue-50 transition-colors"
+                            >
                               <Plus className="w-4 h-4" />
                             </button>
                           </div>
                         ) : (
                           <button
-                            onClick={() => addToCart(med)}
-                            className="w-full mt-3 flex items-center justify-center gap-2 bg-blue-50 hover:bg-[var(--color-primary)] text-[var(--color-primary)] hover:text-white border border-blue-100 hover:border-[var(--color-primary)] py-2.5 rounded-xl text-sm font-semibold transition-all"
+                            onClick={() => requireAuth() && addToCart(med)}
+                            className="w-full mt-3 flex items-center cursor-pointer justify-center gap-2 bg-blue-50 hover:bg-[var(--color-primary)] text-[var(--color-primary)] hover:text-white border border-blue-100 hover:border-[var(--color-primary)] py-2.5 rounded-xl text-sm font-semibold transition-all"
                           >
                             <ShoppingCart className="w-4 h-4" /> Add to Cart
                           </button>

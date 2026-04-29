@@ -49,6 +49,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [showLogin, setShowLogin] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
 
   // ✅ Restore after refresh
   useEffect(() => {
@@ -59,6 +60,7 @@ export function AuthProvider({ children }) {
       setUser(JSON.parse(storedUser));
       setToken(storedToken);
     }
+    setAuthLoading(false);
   }, []);
 
       const fetchProfile = async () => {
@@ -110,8 +112,17 @@ export function AuthProvider({ children }) {
       return updated;
     });
 
+  const requireAuth = () => {
+    const hasToken = localStorage.getItem("token");
+    if (!hasToken) {
+      setShowLogin(true);
+      return false;
+    }
+    return true;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, updateUser, showLogin, setShowLogin }}>
+    <AuthContext.Provider value={{ user, token, login, logout, updateUser, showLogin, setShowLogin, requireAuth, authLoading }}>
       {children}
     </AuthContext.Provider>
   );

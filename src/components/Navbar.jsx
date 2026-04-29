@@ -9,6 +9,7 @@ import { useAuth } from '../context/AuthContext';
 
 
 export default function Navbar() {
+   const { requireAuth } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, logout, setShowLogin } = useAuth();
   const { items: wishlistItems =[] } = useWishlist();
@@ -19,7 +20,7 @@ export default function Navbar() {
     { label: "Tests", to: "/lab-tests" },
     { label: "Medicines", to: "/medicines" },
     { label: "Doctors", to: "/doctors" },
-    { label: "Wishlist", to: "/wishlist" },
+    // { label: "Wishlist", to: "/wishlist" },
     ...(user ? [{ label: "Account", to: "/account" }] : []),
   ];
   
@@ -96,13 +97,13 @@ export default function Navbar() {
 
             {/* Wishlist */}
             <button
-              onClick={() => navigate('/wishlist')}
-              className="relative w-9 h-9 flex items-center justify-center rounded-xl border border-[var(--color-border)] hover:border-red-300 hover:bg-red-50 transition-all"
+              onClick={() => requireAuth() && navigate("/wishlist")}
+              className="relative w-9 h-9 cursor-pointer flex items-center justify-center rounded-xl border border-[var(--color-border)] hover:border-red-300 hover:bg-red-50 transition-all"
             >
               <Heart className="w-4 h-4 text-[var(--color-text-secondary)] hover:text-red-500" />
               {wishlistItems.length > 0 && (
                 <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                  {wishlistItems.length > 9 ? '9+' : wishlistItems.length}
+                  {wishlistItems.length > 9 ? "9+" : wishlistItems.length}
                 </span>
               )}
             </button>
@@ -179,7 +180,7 @@ export default function Navbar() {
                   }`
                 }
               >
-                { label}
+                {label}
                 {badge && (
                   <span className="bg-[var(--color-primary)] text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
                     {badge}

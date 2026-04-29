@@ -78,6 +78,7 @@ export default function MedicineCart() {
         address_id: selectedAddress,
         note,
         prescription: prescriptionFile,
+        type: 'medicine',
       });
       if (res.success) {
         setOrderResult(res.data);

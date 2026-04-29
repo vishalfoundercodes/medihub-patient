@@ -46,15 +46,6 @@ export default function Account() {
   const [activeSection, setActiveSection] = useState('account');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-  useEffect(() => {
-    if (!user) {
-      setShowLogin(true);
-      navigate('/');
-    }
-  }, [user]);
-
-  if (!user) return null;
-
   return (
     <div className="min-h-screen bg-[var(--color-bg-main)]">
       <Navbar />

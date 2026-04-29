@@ -148,7 +148,7 @@ export default function ProfileInfo() {
               <button
                 type="button"
                 onClick={() => fileInputRef.current.click()}
-                className="flex items-center gap-2 text-sm font-semibold text-[var(--color-primary)] border border-[var(--color-primary)] px-4 py-2 rounded-xl hover:bg-blue-50 transition-all"
+                className="flex items-center gap-2 cursor-pointer text-sm font-semibold text-[var(--color-primary)] border border-[var(--color-primary)] px-4 py-2 rounded-xl hover:bg-blue-50 transition-all"
               >
                 <Upload className="w-3.5 h-3.5" /> Upload Photo
               </button>
@@ -160,7 +160,7 @@ export default function ProfileInfo() {
           <EditField icon={User} label="Full Name" value={form.name} onChange={(v) => setForm((p) => ({ ...p, name: v }))} />
 
           {/* Email */}
-          <EditField icon={Mail} label="Email Address" type="email" value={form.email} onChange={(v) => setForm((p) => ({ ...p, email: v }))} />
+          <EditField icon={Mail} label="Email Address" type="email" value={form.email} readOnly  onChange={(v) => setForm((p) => ({ ...p, email: v }))} />
 
           {/* DOB */}
           <EditField icon={Calendar} label="Date of Birth" type="date" value={form.dob} onChange={(v) => setForm((p) => ({ ...p, dob: v }))} />
@@ -173,7 +173,7 @@ export default function ProfileInfo() {
                 <button
                   key={g} type="button"
                   onClick={() => setForm((p) => ({ ...p, gender: g }))}
-                  className={`flex-1 py-2 rounded-xl border text-sm font-semibold capitalize transition-all
+                  className={`flex-1 py-2 cursor-pointer rounded-xl border text-sm font-semibold capitalize transition-all
                     ${form.gender === g ? 'border-[var(--color-primary)] bg-blue-50 text-[var(--color-primary)]' : 'border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-blue-200'}`}
                 >
                   {g}
@@ -190,7 +190,7 @@ export default function ProfileInfo() {
                 <button
                   key={bg} type="button"
                   onClick={() => setForm((p) => ({ ...p, blood_group: bg }))}
-                  className={`px-3 py-1.5 rounded-xl border text-sm font-semibold transition-all
+                  className={`px-3 py-1.5 cursor-pointer rounded-xl border text-sm font-semibold transition-all
                     ${form.blood_group === bg ? 'border-[var(--color-primary)] bg-blue-50 text-[var(--color-primary)]' : 'border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-blue-200'}`}
                 >
                   {bg}
@@ -217,17 +217,31 @@ export default function ProfileInfo() {
   );
 }
 
-function EditField({ icon: Icon, label, value, onChange, type = 'text', placeholder }) {
+function EditField({
+  icon: Icon,
+  label,
+  value,
+  onChange,
+  type = "text",
+  placeholder,
+  readOnly = false,
+}) {
   return (
     <div>
-      <label className="text-xs font-semibold text-[var(--color-text-secondary)] mb-1.5 block">{label}</label>
+      <label className="text-xs font-semibold text-[var(--color-text-secondary)] mb-1.5 block">
+        {label}
+      </label>
       <div className="relative">
         <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-secondary)]" />
         <input
-          type={type} value={value}
-          onChange={(e) => onChange(e.target.value)}
+          type={type}
+          value={value}
+          onChange={(e) => !readOnly && onChange(e.target.value)} // 👈 important
           placeholder={placeholder}
-          className="w-full pl-10 pr-4 py-2.5 border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+          readOnly={readOnly}
+          // className="w-full pl-10 pr-4 py-2.5 border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+          className={`w-full pl-10 pr-4 py-2.5 border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]
+            ${readOnly ? "bg-gray-50 cursor-not-allowed text-[var(--color-text-secondary)]" : ""}`}
         />
       </div>
     </div>

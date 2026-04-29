@@ -10,7 +10,7 @@ const QUICK_LINKS = [
   { label: 'Tests',     to: '/lab-tests' },
   { label: 'Medicines', to: '/medicines' },
   { label: 'Doctors',   to: '/doctors'   },
-  { label: 'Wishlist',  to: '/wishlist'  },
+  // { label: 'Wishlist',  to: '/wishlist'  },
 ];
 
 const COMPANY_LINKS = [
